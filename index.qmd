@@ -8,15 +8,3 @@ I'm all set.
 ## Introduction
 
 This is my Quarto document created in RStudio.
-
-### R Code Example
-
-Here's a simple R code chunk:
-
-```{r}
-#| echo: true
-#| warning: false
-
-library(ggplot2)
-data <- data.frame(x = 1:10, y = rnorm(10))
-plot(data$x, data$y, main = "Sample Plot")
