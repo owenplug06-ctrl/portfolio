@@ -1,0 +1,118 @@
+---
+title: "hw5"
+format: 
+  html: 
+    output-file: "index"
+---
+Exercise 2:
+
+[Bad Bunny](images/badbunny)
+
+marks used: This graph has the marks of bars.
+
+mappings used: Color is used to map which song is Bad Bunny's, Images are mapped to see which album is which, text is mapped on the axis for the title of each album and for additional info on the three most streamed Bad Bunny songs.
+
+Story: The main story of this graph is to showcase how popular Bad Bunny has become in recent years.
+
+Why is it good: What makes this graphic amazing is the use of color to draw attention to Bad Bunny's albums, as well as the text given to give more context in the graph.
+
+What do I know: I would know how to make the bar graphs and change the colors of the bars.
+
+What I don't know: I don't know how to add in the floating text, images on the bars, or how to make the text different colors on the x-axis.
+
+Exercise 3:
+
+```{r}
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Daily Temperature Overlay by Day of Year",
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/weather-with-dates.csv"
+  },
+  "transform": [
+    {
+      "calculate": "dayofyear(datum.date)",
+      "as": "day_of_year"
+    },
+    {
+      "calculate": "year(datum.date)",
+      "as": "year"
+    }
+  ],
+  "mark": {
+    "type": "line",
+    "opacity": 0.4
+  },
+  "encoding": {
+    "x": {
+      "field": "day_of_year",
+      "type": "quantitative",
+      "title": "Day of Year"
+    },
+    "y": {
+      "field": "temp_max",
+      "type": "quantitative",
+      "title": "Maximum Temperature (°C)"
+    },
+    "color": {
+      "field": "year",
+      "type": "nominal",
+      "title": "Year"
+    }
+  }
+}' |> as_vegaspec()
+```
+
+```{r}
+library(vegawidget)
+
+spec <- '{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Monthly Weather Type Distribution in Seattle",
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/weather-with-dates.csv"
+  },
+  "transform": [
+    {
+      "calculate": "month(datum.date)",
+      "as": "month"
+    },
+    {
+      "filter": "datum.weather != null"
+    },
+    {
+      "aggregate": [
+        { "op": "count", "as": "count" }
+      ],
+      "groupby": ["month", "weather"]
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "month",
+      "type": "ordinal",
+      "title": "Month",
+      "axis": {
+        "labelExpr": "[\\\"Jan\\\",\\\"Feb\\\",\\\"Mar\\\",\\\"Apr\\\",\\\"May\\\",\\\"Jun\\\",\\\"Jul\\\",\\\"Aug\\\",\\\"Sep\\\",\\\"Oct\\\",\\\"Nov\\\",\\\"Dec\\\"][datum.value - 1]"
+      }
+    },
+    "xOffset": {
+      "field": "weather"
+    },
+    "y": {
+      "field": "count",
+      "type": "quantitative",
+      "title": "Number of Days"
+    },
+    "color": {
+      "field": "weather",
+      "type": "nominal",
+      "title": "Weather Type"
+    }
+  }
+}'
+
+spec |> as_vegaspec()
+```
