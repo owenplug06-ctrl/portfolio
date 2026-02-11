@@ -6,7 +6,7 @@ format:
 ---
 Exercise 2:
 
-[Bad Bunny](images/badbunny)
+[Bad Bunny](images/badbunny.png)
 
 marks used: This graph has the marks of bars.
 
