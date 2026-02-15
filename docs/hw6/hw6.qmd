@@ -1,0 +1,13 @@
+---
+title: "hw6"
+format: 
+  html:  
+    output-file: 'index'
+embed-resources: true
+---
+
+Exercise 1:
+a. The most interesting lesson I learned from the Tufte reading was how he deals with some time series data that can fluctuate with season trends. In the graphic that he displays on page 38, he goes through how the market trends deviate in a seasonal pattern however, after aggregation you get a different story of the data.
+
+b.
+The image I chose is on page 49 [Copper Conductivity](images/hw6.png). I chose this graphic because i find it super interesting how much data is able to be shown with little ink, as well as I find it interesting how the trends of copper conductivity merge at a high enough temperature. The encoded features are the x-axis being mapped to the degree temperature in Kelvin and the y-axis is mapped to the level of conductivity. An element of the graphic that would be hard to implement is the different lines in the background that appear and disappear. Tufte is trying to show how the conductivity of the coppers end up almost coming exactly together at around 5*10^3 Kelvin.
