@@ -1,0 +1,859 @@
+---
+title: "hw7"
+format: 
+  html:
+    output-file: "index"
+embed-resources: true
+---
+
+Exercise 1:
+A. Some guidelines on bar charts include avoid rotating the names of the bars, order them in terms of size unless there is a normal order for the bars like height or weight.
+
+B. It is considered impractical to use a bar graph when the data cannot be shown starting at 0 without obscuring key features.
+
+C. The two alternatives mentioned are the dot plots and heat maps.
+
+E.
+```{r}
+#| echo: false
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "values": [
+      {"title_short": "Star Wars", "amount": 71565498, "title": "Star Wars: The Last Jedi", "amount_text": "$71,565,498"},
+      {"title_short": "Jumanji", "amount": 36169328, "title": "Jumanji: Welcome to the Jungle", "amount_text": "$36,169,328"},
+      {"title_short": "Pitch Perfect 3", "amount": 19928525, "title": "Pitch Perfect 3", "amount_text": "$19,928,525"},
+      {"title_short": "Greatest Showman", "amount": 8805843, "title": "The Greatest Showman", "amount_text": "$8,805,843"},
+      {"title_short": "Ferdinand", "amount": 7316746, "title": "Ferdinand", "amount_text": "$7,316,746"}
+    ]
+  },
+  "mark": "bar",
+  "encoding": {
+    "y": {
+      "field": "title_short",
+      "type": "nominal",
+      "title": "Movie",
+      "sort": {"field": "amount", "order": "descending"},
+      "axis": {"labelAngle": 0}
+    },
+    "x": {
+      "field": "amount",
+      "type": "quantitative",
+      "title": "Weekend Gross (USD)",
+      "axis": {"format": "$,.0f"}
+    }
+  } 
+}' |> as_vegaspec()
+```
+
+F.
+```{r}
+#| echo: false
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "values": [
+      {"age": "15 to 24", "median_income": 44588, "race": "white"},
+      {"age": "25 to 34", "median_income": 65389, "race": "white"},
+      {"age": "35 to 44", "median_income": 78093, "race": "white"},
+      {"age": "45 to 54", "median_income": 82289, "race": "white"},
+      {"age": "55 to 64", "median_income": 69387, "race": "white"},
+      {"age": "65 to 74", "median_income": 52219, "race": "white"},
+      {"age": "> 74", "median_income": 32203, "race": "white"},
+      {"age": "15 to 24", "median_income": 45809, "race": "asian"},
+      {"age": "25 to 34", "median_income": 80098, "race": "asian"},
+      {"age": "35 to 44", "median_income": 100443, "race": "asian"},
+      {"age": "45 to 54", "median_income": 98925, "race": "asian"},
+      {"age": "55 to 64", "median_income": 91193, "race": "asian"},
+      {"age": "65 to 74", "median_income": 56646, "race": "asian"},
+      {"age": "> 74", "median_income": 26487, "race": "asian"},
+      {"age": "15 to 24", "median_income": 30267, "race": "black"},
+      {"age": "25 to 34", "median_income": 39176, "race": "black"},
+      {"age": "35 to 44", "median_income": 49336, "race": "black"},
+      {"age": "45 to 54", "median_income": 50103, "race": "black"},
+      {"age": "55 to 64", "median_income": 40363, "race": "black"},
+      {"age": "65 to 74", "median_income": 28697, "race": "black"},
+      {"age": "> 74", "median_income": 22302, "race": "black"},
+      {"age": "15 to 24", "median_income": 45080, "race": "hispanic"},
+      {"age": "25 to 34", "median_income": 45876, "race": "hispanic"},
+      {"age": "35 to 44", "median_income": 50245, "race": "hispanic"},
+      {"age": "45 to 54", "median_income": 58103, "race": "hispanic"},
+      {"age": "55 to 64", "median_income": 51996, "race": "hispanic"},
+      {"age": "65 to 74", "median_income": 36704, "race": "hispanic"},
+      {"age": "> 74", "median_income": 23797, "race": "hispanic"}
+    ]
+  },
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "race",
+      "type": "nominal",
+      "title": "Race/Ethnicity",
+      "sort": [ "white", "asian", "black", "hispanic"]
+    },
+    "y": {
+      "field": "median_income",
+      "type": "quantitative",
+      "title": "Median Income (USD)",
+      "axis": {"format": "$,.0f"}
+    },
+    "xOffset": {
+      "field": "age",
+      "type": "nominal",
+      "sort": ["15 to 24", "25 to 34", "35 to 44", "45 to 54", "55 to 64", "65 to 74", "> 74"]
+    },
+    "color": {
+      "field": "age",
+      "type": "nominal",
+      "title": "Age Group",
+      "scale": {
+        "domain": ["15 to 24", "25 to 34", "35 to 44", "45 to 54", "55 to 64", "65 to 74", "> 75"],
+        "scheme": "Blues"
+      }
+    }
+  }
+}' |> as_vegaspec()
+```
+
+```{r}
+#| echo: false
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "vconcat": [
+    {
+      "hconcat": [
+        {
+          "data": {
+            "values": [
+              {"age": "15 to 24", "median_income": 44588, "race": "white"},
+              {"age": "25 to 34", "median_income": 65389, "race": "white"},
+              {"age": "35 to 44", "median_income": 78093, "race": "white"},
+              {"age": "45 to 54", "median_income": 82289, "race": "white"},
+              {"age": "55 to 64", "median_income": 69387, "race": "white"},
+              {"age": "65 to 74", "median_income": 52219, "race": "white"},
+              {"age": "> 75", "median_income": 32203, "race": "white"}
+            ]
+          },
+          "mark": "bar",
+          "title": "White",
+          "encoding": {
+            "x": {"field": "age", "type": "nominal", "title": null, "sort": ["15 to 24", "25 to 34", "35 to 44", "45 to 54", "55 to 64", "65 to 74", "> 75"], "axis": {"labelAngle": 45}},
+            "y": {"field": "median_income", "type": "quantitative", "title": "Median Income (USD)", "axis": {"format": "$,.0f"}},
+            "color": {"field": "age", "type": "nominal", "scale": {"scheme": "blues"}, "legend": null}
+          }
+        },
+        {
+          "data": {
+            "values": [
+              {"age": "15 to 24", "median_income": 45809, "race": "asian"},
+              {"age": "25 to 34", "median_income": 80098, "race": "asian"},
+              {"age": "35 to 44", "median_income": 100443, "race": "asian"},
+              {"age": "45 to 54", "median_income": 98925, "race": "asian"},
+              {"age": "55 to 64", "median_income": 91193, "race": "asian"},
+              {"age": "65 to 74", "median_income": 56646, "race": "asian"},
+              {"age": "> 75", "median_income": 26487, "race": "asian"}
+            ]
+          },
+          "mark": "bar",
+          "title": "Asian",
+          "encoding": {
+            "x": {"field": "age", "type": "nominal", "title": null, "sort": ["15 to 24", "25 to 34", "35 to 44", "45 to 54", "55 to 64", "65 to 74", "> 75"], "axis": {"labelAngle": 45}},
+            "y": {"field": "median_income", "type": "quantitative", "title": null, "axis": {"format": "$,.0f"}},
+            "color": {"field": "age", "type": "nominal", "scale": {"scheme": "blues"}, "legend": null}
+          }
+        }
+      ]
+    },
+    {
+      "hconcat": [
+        {
+          "data": {
+            "values": [
+              {"age": "15 to 24", "median_income": 30267, "race": "black"},
+              {"age": "25 to 34", "median_income": 39176, "race": "black"},
+              {"age": "35 to 44", "median_income": 49336, "race": "black"},
+              {"age": "45 to 54", "median_income": 50103, "race": "black"},
+              {"age": "55 to 64", "median_income": 40363, "race": "black"},
+              {"age": "65 to 74", "median_income": 28697, "race": "black"},
+              {"age": "> 75", "median_income": 22302, "race": "black"}
+            ]
+          },
+          "mark": "bar",
+          "title": "Black",
+          "encoding": {
+            "x": {"field": "age", "type": "nominal", "title": null, "sort": ["15 to 24", "25 to 34", "35 to 44", "45 to 54", "55 to 64", "65 to 74", "> 75"], "axis": {"labelAngle": 45}},
+            "y": {"field": "median_income", "type": "quantitative", "title": "Median Income (USD)", "axis": {"format": "$,.0f"}},
+            "color": {"field": "age", "type": "nominal", "scale": {"scheme": "blues"}, "legend": null}
+          }
+        },
+        {
+          "data": {
+            "values": [
+              {"age": "15 to 24", "median_income": 45080, "race": "hispanic"},
+              {"age": "25 to 34", "median_income": 45876, "race": "hispanic"},
+              {"age": "35 to 44", "median_income": 50245, "race": "hispanic"},
+              {"age": "45 to 54", "median_income": 58103, "race": "hispanic"},
+              {"age": "55 to 64", "median_income": 51996, "race": "hispanic"},
+              {"age": "65 to 74", "median_income": 36704, "race": "hispanic"},
+              {"age": "> 75", "median_income": 23797, "race": "hispanic"}
+            ]
+          },
+          "mark": "bar",
+          "title": "Hispanic",
+          "encoding": {
+            "x": {"field": "age", "type": "nominal", "title": null, "sort": ["15 to 24", "25 to 34", "35 to 44", "45 to 54", "55 to 64", "65 to 74", "> 75"], "axis": {"labelAngle": 45}},
+            "y": {"field": "median_income", "type": "quantitative", "title": null, "axis": {"format": "$,.0f"}},
+            "color": {"field": "age", "type": "nominal", "scale": {"scheme": "blues"}, "legend": null}
+          }
+        }
+      ]
+    }
+  ]
+}' |> as_vegaspec()
+```
+
+Exercise 2:
+
+B. The three questions you can ask yourself about your graph to help your ability are is this bad taste, bad data, or bad perspective. The video highlights these three questions as able to describe anything wrong with a graph.
+
+C. The map of napoleons failure to reach Moscow. Mortality in the United states.
+
+Exercise 3:
+
+A. Mapping data points onto colors in a continuous fashion
+
+B.
+```{r}
+#| echo: false
+library(vegawidget)
+'{"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "values": [
+      {"country": "Argentina", "year": 1990, "users": 0},
+      {"country": "Brazil", "year": 1990, "users": 0},
+      {"country": "Canada", "year": 1990, "users": 0.360999701},
+      {"country": "Chile", "year": 1990, "users": 0},
+      {"country": "China", "year": 1990, "users": 0},
+      {"country": "Germany", "year": 1990, "users": 0.125892223},
+      {"country": "Algeria", "year": 1990, "users": 0},
+      {"country": "France", "year": 1990, "users": 0.052777862},
+      {"country": "United Kingdom", "year": 1990, "users": 0.087355319},
+      {"country": "India", "year": 1990, "users": 0},
+      {"country": "Iceland", "year": 1990, "users": 0},
+      {"country": "Israel", "year": 1990, "users": 0.110773866},
+      {"country": "Italy", "year": 1990, "users": 0.017544562},
+      {"country": "Japan", "year": 1990, "users": 0.020293683},
+      {"country": "Kenya", "year": 1990, "users": 0},
+      {"country": "Mexico", "year": 1990, "users": 0},
+      {"country": "Norway", "year": 1990, "users": 0.707299448},
+      {"country": "New Zealand", "year": 1990, "users": 0},
+      {"country": "United States", "year": 1990, "users": 0.784728502},
+      {"country": "South Africa", "year": 1990, "users": 0},
+      {"country": "Argentina", "year": 1991, "users": null},
+      {"country": "Brazil", "year": 1991, "users": 0.003288171},
+      {"country": "Canada", "year": 1991, "users": 0.570385926},
+      {"country": "Chile", "year": 1991, "users": null},
+      {"country": "China", "year": 1991, "users": null},
+      {"country": "Germany", "year": 1991, "users": 0.250274153},
+      {"country": "Algeria", "year": 1991, "users": null},
+      {"country": "France", "year": 1991, "users": 0.140113895},
+      {"country": "United Kingdom", "year": 1991, "users": 0.174230922},
+      {"country": "India", "year": 1991, "users": null},
+      {"country": "Iceland", "year": 1991, "users": 0.505129002},
+      {"country": "Israel", "year": 1991, "users": 0.2146241},
+      {"country": "Italy", "year": 1991, "users": 0.035063256},
+      {"country": "Japan", "year": 1991, "users": 0.040438041},
+      {"country": "Kenya", "year": 1991, "users": null},
+      {"country": "Mexico", "year": 1991, "users": 0.005880695},
+      {"country": "Norway", "year": 1991, "users": 1.407395158},
+      {"country": "New Zealand", "year": 1991, "users": null},
+      {"country": "United States", "year": 1991, "users": 1.163193726},
+      {"country": "South Africa", "year": 1991, "users": 0.013283591},
+      {"country": "Argentina", "year": 1992, "users": 0.002992874},
+      {"country": "Brazil", "year": 1992, "users": 0.012946262},
+      {"country": "Canada", "year": 1992, "users": 0.91598104},
+      {"country": "Chile", "year": 1992, "users": 0.036548938},
+      {"country": "China", "year": 1992, "users": null},
+      {"country": "Germany", "year": 1992, "users": 0.43528529},
+      {"country": "Algeria", "year": 1992, "users": null},
+      {"country": "France", "year": 1992, "users": 0.279049463},
+      {"country": "United Kingdom", "year": 1992, "users": 0.260615159},
+      {"country": "India", "year": 1992, "users": 0.000111308},
+      {"country": "Iceland", "year": 1992, "users": 1.53916008},
+      {"country": "Israel", "year": 1992, "users": 0.310579197},
+      {"country": "Italy", "year": 1992, "users": 0.070053433},
+      {"country": "Japan", "year": 1992, "users": 0.096678025},
+      {"country": "Kenya", "year": 1992, "users": null},
+      {"country": "Mexico", "year": 1992, "users": 0.01730781},
+      {"country": "Norway", "year": 1992, "users": 2.216365832},
+      {"country": "New Zealand", "year": 1992, "users": 0.285941241},
+      {"country": "United States", "year": 1992, "users": 1.724202539},
+      {"country": "South Africa", "year": 1992, "users": 0.038869106},
+      {"country": "Argentina", "year": 1993, "users": 0.029527065},
+      {"country": "Brazil", "year": 1993, "users": 0.025498253},
+      {"country": "Canada", "year": 1993, "users": 1.184557509},
+      {"country": "Chile", "year": 1993, "users": 0.071783144},
+      {"country": "China", "year": 1993, "users": 0.00016868},
+      {"country": "Germany", "year": 1993, "users": 0.463635096},
+      {"country": "Algeria", "year": 1993, "users": null},
+      {"country": "France", "year": 1993, "users": 0.590619383},
+      {"country": "United Kingdom", "year": 1993, "users": 0.519762001},
+      {"country": "India", "year": 1993, "users": 0.000218176},
+      {"country": "Iceland", "year": 1993, "users": 2.667825265},
+      {"country": "Israel", "year": 1993, "users": 0.398833333},
+      {"country": "Italy", "year": 1993, "users": 0.122462053},
+      {"country": "Japan", "year": 1993, "users": 0.401277526},
+      {"country": "Kenya", "year": 1993, "users": null},
+      {"country": "Mexico", "year": 1993, "users": 0.028305042},
+      {"country": "Norway", "year": 1993, "users": 2.783990846},
+      {"country": "New Zealand", "year": 1993, "users": 0.631215367},
+      {"country": "United States", "year": 1993, "users": 2.271673294},
+      {"country": "South Africa", "year": 1993, "users": 0.113747184},
+      {"country": "Argentina", "year": 1994, "users": 0.043705951},
+      {"country": "Brazil", "year": 1994, "users": 0.037672709},
+      {"country": "Canada", "year": 1994, "users": 2.378693853},
+      {"country": "Chile", "year": 1994, "users": 0.141084507},
+      {"country": "China", "year": 1994, "users": 0.001168115},
+      {"country": "Germany", "year": 1994, "users": 0.922541043},
+      {"country": "Algeria", "year": 1994, "users": 0.000360674},
+      {"country": "France", "year": 1994, "users": 0.899867425},
+      {"country": "United Kingdom", "year": 1994, "users": 1.036609166},
+      {"country": "India", "year": 1994, "users": 0.001069562},
+      {"country": "Iceland", "year": 1994, "users": 6.794811784},
+      {"country": "Israel", "year": 1994, "users": 0.57696646},
+      {"country": "Italy", "year": 1994, "users": 0.192304619},
+      {"country": "Japan", "year": 1994, "users": 0.799684291},
+      {"country": "Kenya", "year": 1994, "users": null},
+      {"country": "Mexico", "year": 1994, "users": 0.043339167},
+      {"country": "Norway", "year": 1994, "users": 4.152450292},
+      {"country": "New Zealand", "year": 1994, "users": 3.168718848},
+      {"country": "United States", "year": 1994, "users": 4.862780635},
+      {"country": "South Africa", "year": 1994, "users": 0.246905533},
+      {"country": "Argentina", "year": 1995, "users": 0.086277081},
+      {"country": "Brazil", "year": 1995, "users": 0.105138168},
+      {"country": "Canada", "year": 1995, "users": 4.163525253},
+      {"country": "Chile", "year": 1995, "users": 0.346980781},
+      {"country": "China", "year": 1995, "users": 0.00495471},
+      {"country": "Germany", "year": 1995, "users": 1.837737754},
+      {"country": "Algeria", "year": 1995, "users": 0.001768954},
+      {"country": "France", "year": 1995, "users": 1.637947245},
+      {"country": "United Kingdom", "year": 1995, "users": 1.895168284},
+      {"country": "India", "year": 1995, "users": 0.026228879},
+      {"country": "Iceland", "year": 1995, "users": 11.2158757},
+      {"country": "Israel", "year": 1995, "users": 0.93042297},
+      {"country": "Italy", "year": 1995, "users": 0.524412787},
+      {"country": "Japan", "year": 1995, "users": 1.594363148},
+      {"country": "Kenya", "year": 1995, "users": 0.000727482},
+      {"country": "Mexico", "year": 1995, "users": 0.10256419},
+      {"country": "Norway", "year": 1995, "users": 6.423220493},
+      {"country": "New Zealand", "year": 1995, "users": 4.88424078},
+      {"country": "United States", "year": 1995, "users": 9.237088297},
+      {"country": "South Africa", "year": 1995, "users": 0.676740104},
+      {"country": "Argentina", "year": 1996, "users": 0.141954704},
+      {"country": "Brazil", "year": 1996, "users": 0.450789179},
+      {"country": "Canada", "year": 1996, "users": 6.76023965},
+      {"country": "Chile", "year": 1996, "users": 0.68347561},
+      {"country": "China", "year": 1996, "users": 0.013081692},
+      {"country": "Germany", "year": 1996, "users": 3.054805234},
+      {"country": "Algeria", "year": 1996, "users": 0.001738533},
+      {"country": "France", "year": 1996, "users": 2.584033979},
+      {"country": "United Kingdom", "year": 1996, "users": 4.123650336},
+      {"country": "India", "year": 1996, "users": 0.046333977},
+      {"country": "Iceland", "year": 1996, "users": 14.80647932},
+      {"country": "Israel", "year": 1996, "users": 2.1683676},
+      {"country": "Italy", "year": 1996, "users": 1.023289903},
+      {"country": "Japan", "year": 1996, "users": 4.372981968},
+      {"country": "Kenya", "year": 1996, "users": 0.008839115},
+      {"country": "Mexico", "year": 1996, "users": 0.20040628},
+      {"country": "Norway", "year": 1996, "users": 18.25031077},
+      {"country": "New Zealand", "year": 1996, "users": 8.041899368},
+      {"country": "United States", "year": 1996, "users": 16.41935296},
+      {"country": "South Africa", "year": 1996, "users": 0.841882931},
+      {"country": "Argentina", "year": 1997, "users": 0.280339882},
+      {"country": "Brazil", "year": 1997, "users": 0.786079155},
+      {"country": "Canada", "year": 1997, "users": 15.07235736},
+      {"country": "Chile", "year": 1997, "users": 1.057092496},
+      {"country": "China", "year": 1997, "users": 0.032394861},
+      {"country": "Germany", "year": 1997, "users": 6.711087477},
+      {"country": "Algeria", "year": 1997, "users": 0.010268463},
+      {"country": "France", "year": 1997, "users": 4.255003872},
+      {"country": "United Kingdom", "year": 1997, "users": 7.385398957},
+      {"country": "India", "year": 1997, "users": 0.070767849},
+      {"country": "Iceland", "year": 1997, "users": 27.47886875},
+      {"country": "Israel", "year": 1997, "users": 4.399405482},
+      {"country": "Italy", "year": 1997, "users": 2.276737834},
+      {"country": "Japan", "year": 1997, "users": 9.16307714},
+      {"country": "Kenya", "year": 1997, "users": 0.034406051},
+      {"country": "Mexico", "year": 1997, "users": 0.62731154},
+      {"country": "Norway", "year": 1997, "users": 20.41788144},
+      {"country": "New Zealand", "year": 1997, "users": 14.6015244},
+      {"country": "United States", "year": 1997, "users": 21.61640097},
+      {"country": "South Africa", "year": 1997, "users": 1.632093791},
+      {"country": "Argentina", "year": 1998, "users": 0.83076668},
+      {"country": "Brazil", "year": 1998, "users": 1.477874959},
+      {"country": "Canada", "year": 1998, "users": 24.8974003},
+      {"country": "Chile", "year": 1998, "users": 1.662322022},
+      {"country": "China", "year": 1998, "users": 0.168540297},
+      {"country": "Germany", "year": 1998, "users": 9.877852428},
+      {"country": "Algeria", "year": 1998, "users": 0.020238555},
+      {"country": "France", "year": 1998, "users": 6.319778722},
+      {"country": "United Kingdom", "year": 1998, "users": 13.6699831},
+      {"country": "India", "year": 1998, "users": 0.139027329},
+      {"country": "Iceland", "year": 1998, "users": 36.2642065},
+      {"country": "Israel", "year": 1998, "users": 10.30706995},
+      {"country": "Italy", "year": 1998, "users": 4.558519565},
+      {"country": "Japan", "year": 1998, "users": 13.41404088},
+      {"country": "Kenya", "year": 1998, "users": 0.050261388},
+      {"country": "Mexico", "year": 1998, "users": 1.265783278},
+      {"country": "Norway", "year": 1998, "users": 22.56011255},
+      {"country": "New Zealand", "year": 1998, "users": 31.63626081},
+      {"country": "United States", "year": 1998, "users": 30.09319659},
+      {"country": "South Africa", "year": 1998, "users": 2.906220867},
+      {"country": "Argentina", "year": 1999, "users": 3.284481956},
+      {"country": "Brazil", "year": 1999, "users": 2.038732184},
+      {"country": "Canada", "year": 1999, "users": 36.18644004},
+      {"country": "Chile", "year": 1999, "users": 4.103419297},
+      {"country": "China", "year": 1999, "users": 0.708187957},
+      {"country": "Germany", "year": 1999, "users": 20.84598264},
+      {"country": "Algeria", "year": 1999, "users": 0.199523843},
+      {"country": "France", "year": 1999, "users": 9.125317889},
+      {"country": "United Kingdom", "year": 1999, "users": 21.29363827},
+      {"country": "India", "year": 1999, "users": 0.273224277},
+      {"country": "Iceland", "year": 1999, "users": 41.29456671},
+      {"country": "Israel", "year": 1999, "users": 13.43612191},
+      {"country": "Italy", "year": 1999, "users": 14.37841019},
+      {"country": "Japan", "year": 1999, "users": 21.39129031},
+      {"country": "Kenya", "year": 1999, "users": 0.114256028},
+      {"country": "Mexico", "year": 1999, "users": 1.857436221},
+      {"country": "Norway", "year": 1999, "users": 40},
+      {"country": "New Zealand", "year": 1999, "users": 41.49448266},
+      {"country": "United States", "year": 1999, "users": 35.84872446},
+      {"country": "South Africa", "year": 1999, "users": 4.116249583},
+      {"country": "Argentina", "year": 2000, "users": 7.038683086},
+      {"country": "Brazil", "year": 2000, "users": 2.870685159},
+      {"country": "Canada", "year": 2000, "users": 51.3},
+      {"country": "Chile", "year": 2000, "users": 16.6},
+      {"country": "China", "year": 2000, "users": 1.775913207},
+      {"country": "Germany", "year": 2000, "users": 30.2163466},
+      {"country": "Algeria", "year": 2000, "users": 0.491705679},
+      {"country": "France", "year": 2000, "users": 14.30792394},
+      {"country": "United Kingdom", "year": 2000, "users": 26.82175435},
+      {"country": "India", "year": 2000, "users": 0.52753245},
+      {"country": "Iceland", "year": 2000, "users": 44.47053382},
+      {"country": "Israel", "year": 2000, "users": 20.87379},
+      {"country": "Italy", "year": 2000, "users": 23.11087424},
+      {"country": "Japan", "year": 2000, "users": 29.99074036},
+      {"country": "Kenya", "year": 2000, "users": 0.318059714},
+      {"country": "Mexico", "year": 2000, "users": 5.081384153},
+      {"country": "Norway", "year": 2000, "users": 52},
+      {"country": "New Zealand", "year": 2000, "users": 47.37955654},
+      {"country": "United States", "year": 2000, "users": 43.07916264},
+      {"country": "South Africa", "year": 2000, "users": 5.348559732},
+      {"country": "Argentina", "year": 2001, "users": 9.780807285},
+      {"country": "Brazil", "year": 2001, "users": 4.528494869},
+      {"country": "Canada", "year": 2001, "users": 60.2},
+      {"country": "Chile", "year": 2001, "users": 19.1},
+      {"country": "China", "year": 2001, "users": 2.639650215},
+      {"country": "Germany", "year": 2001, "users": 31.65093942},
+      {"country": "Algeria", "year": 2001, "users": 0.646114017},
+      {"country": "France", "year": 2001, "users": 26.32590355},
+      {"country": "United Kingdom", "year": 2001, "users": 33.48109487},
+      {"country": "India", "year": 2001, "users": 0.660146377},
+      {"country": "Iceland", "year": 2001, "users": 49.39299537},
+      {"country": "Israel", "year": 2001, "users": 17.37862386},
+      {"country": "Italy", "year": 2001, "users": 27.22211598},
+      {"country": "Japan", "year": 2001, "users": 38.53206086},
+      {"country": "Kenya", "year": 2001, "users": 0.619782266},
+      {"country": "Mexico", "year": 2001, "users": 7.038023117},
+      {"country": "Norway", "year": 2001, "users": 64},
+      {"country": "New Zealand", "year": 2001, "users": 53.24101529},
+      {"country": "United States", "year": 2001, "users": 49.08083159},
+      {"country": "South Africa", "year": 2001, "users": 6.346619318},
+      {"country": "Argentina", "year": 2002, "users": 10.88212438},
+      {"country": "Brazil", "year": 2002, "users": 9.149425086},
+      {"country": "Canada", "year": 2002, "users": 61.59329927},
+      {"country": "Chile", "year": 2002, "users": 22.1},
+      {"country": "China", "year": 2002, "users": 4.595704331},
+      {"country": "Germany", "year": 2002, "users": 48.82},
+      {"country": "Algeria", "year": 2002, "users": 1.59164126},
+      {"country": "France", "year": 2002, "users": 30.18},
+      {"country": "United Kingdom", "year": 2002, "users": 56.48},
+      {"country": "India", "year": 2002, "users": 1.537875582},
+      {"country": "Iceland", "year": 2002, "users": 79.12},
+      {"country": "Israel", "year": 2002, "users": 17.76459906},
+      {"country": "Italy", "year": 2002, "users": 28.04},
+      {"country": "Japan", "year": 2002, "users": 46.59420112},
+      {"country": "Kenya", "year": 2002, "users": 1.207773885},
+      {"country": "Mexico", "year": 2002, "users": 11.9},
+      {"country": "Norway", "year": 2002, "users": 72.84},
+      {"country": "New Zealand", "year": 2002, "users": 59.08075328},
+      {"country": "United States", "year": 2002, "users": 58.78540388},
+      {"country": "South Africa", "year": 2002, "users": 6.710322437},
+      {"country": "Argentina", "year": 2003, "users": 11.91369655},
+      {"country": "Brazil", "year": 2003, "users": 13.2075861},
+      {"country": "Canada", "year": 2003, "users": 64.2},
+      {"country": "Chile", "year": 2003, "users": 25.47377889},
+      {"country": "China", "year": 2003, "users": 6.2},
+      {"country": "Germany", "year": 2003, "users": 55.9},
+      {"country": "Algeria", "year": 2003, "users": 2.195359731},
+      {"country": "France", "year": 2003, "users": 36.14},
+      {"country": "United Kingdom", "year": 2003, "users": 64.82},
+      {"country": "India", "year": 2003, "users": 1.686489971},
+      {"country": "Iceland", "year": 2003, "users": 83.14},
+      {"country": "Israel", "year": 2003, "users": 19.59339366},
+      {"country": "Italy", "year": 2003, "users": 29.04},
+      {"country": "Japan", "year": 2003, "users": 48.43526589},
+      {"country": "Kenya", "year": 2003, "users": 2.941902861},
+      {"country": "Mexico", "year": 2003, "users": 12.9},
+      {"country": "Norway", "year": 2003, "users": 78.13},
+      {"country": "New Zealand", "year": 2003, "users": 60.96253987},
+      {"country": "United States", "year": 2003, "users": 61.69711712},
+      {"country": "South Africa", "year": 2003, "users": 7.007691726},
+      {"country": "Argentina", "year": 2004, "users": 16.03668411},
+      {"country": "Brazil", "year": 2004, "users": 19.07367227},
+      {"country": "Canada", "year": 2004, "users": 65.95596346},
+      {"country": "Chile", "year": 2004, "users": 28.17791012},
+      {"country": "China", "year": 2004, "users": 7.3},
+      {"country": "Germany", "year": 2004, "users": 64.73},
+      {"country": "Algeria", "year": 2004, "users": 4.634475088},
+      {"country": "France", "year": 2004, "users": 39.15},
+      {"country": "United Kingdom", "year": 2004, "users": 65.61},
+      {"country": "India", "year": 2004, "users": 1.976136492},
+      {"country": "Iceland", "year": 2004, "users": 83.88},
+      {"country": "Israel", "year": 2004, "users": 22.77048553},
+      {"country": "Italy", "year": 2004, "users": 33.24},
+      {"country": "Japan", "year": 2004, "users": 62.39392963},
+      {"country": "Kenya", "year": 2004, "users": 3.023528042},
+      {"country": "Mexico", "year": 2004, "users": 14.1},
+      {"country": "Norway", "year": 2004, "users": 77.69},
+      {"country": "New Zealand", "year": 2004, "users": 61.84762781},
+      {"country": "United States", "year": 2004, "users": 64.75825648},
+      {"country": "South Africa", "year": 2004, "users": 8.425118683},
+      {"country": "Argentina", "year": 2005, "users": 17.72058337},
+      {"country": "Brazil", "year": 2005, "users": 21.02274725},
+      {"country": "Canada", "year": 2005, "users": 71.66},
+      {"country": "Chile", "year": 2005, "users": 31.17534703},
+      {"country": "China", "year": 2005, "users": 8.523257003},
+      {"country": "Germany", "year": 2005, "users": 68.71},
+      {"country": "Algeria", "year": 2005, "users": 5.843942092},
+      {"country": "France", "year": 2005, "users": 42.87},
+      {"country": "United Kingdom", "year": 2005, "users": 70},
+      {"country": "India", "year": 2005, "users": 2.388075},
+      {"country": "Iceland", "year": 2005, "users": 87},
+      {"country": "Israel", "year": 2005, "users": 25.19404242},
+      {"country": "Italy", "year": 2005, "users": 35},
+      {"country": "Japan", "year": 2005, "users": 66.9210661},
+      {"country": "Kenya", "year": 2005, "users": 3.101897702},
+      {"country": "Mexico", "year": 2005, "users": 17.21},
+      {"country": "Norway", "year": 2005, "users": 81.99},
+      {"country": "New Zealand", "year": 2005, "users": 62.72021237},
+      {"country": "United States", "year": 2005, "users": 67.96805292},
+      {"country": "South Africa", "year": 2005, "users": 7.48854253},
+      {"country": "Argentina", "year": 2006, "users": 20.9272021},
+      {"country": "Brazil", "year": 2006, "users": 28.17838018},
+      {"country": "Canada", "year": 2006, "users": 72.4},
+      {"country": "Chile", "year": 2006, "users": 34.49775117},
+      {"country": "China", "year": 2006, "users": 10.52315262},
+      {"country": "Germany", "year": 2006, "users": 72.16},
+      {"country": "Algeria", "year": 2006, "users": 7.375984956},
+      {"country": "France", "year": 2006, "users": 46.87},
+      {"country": "United Kingdom", "year": 2006, "users": 68.82},
+      {"country": "India", "year": 2006, "users": 2.805499865},
+      {"country": "Iceland", "year": 2006, "users": 89.51},
+      {"country": "Israel", "year": 2006, "users": 27.88107446},
+      {"country": "Italy", "year": 2006, "users": 37.99},
+      {"country": "Japan", "year": 2006, "users": 68.68527032},
+      {"country": "Kenya", "year": 2006, "users": 3.6},
+      {"country": "Mexico", "year": 2006, "users": 19.52},
+      {"country": "Norway", "year": 2006, "users": 82.55},
+      {"country": "New Zealand", "year": 2006, "users": 69},
+      {"country": "United States", "year": 2006, "users": 68.93119327},
+      {"country": "South Africa", "year": 2006, "users": 7.607139675},
+      {"country": "Argentina", "year": 2007, "users": 25.94663294},
+      {"country": "Brazil", "year": 2007, "users": 30.88},
+      {"country": "Canada", "year": 2007, "users": 73.2},
+      {"country": "Chile", "year": 2007, "users": 35.9},
+      {"country": "China", "year": 2007, "users": 16},
+      {"country": "Germany", "year": 2007, "users": 75.16},
+      {"country": "Algeria", "year": 2007, "users": 9.451190626},
+      {"country": "France", "year": 2007, "users": 66.09},
+      {"country": "United Kingdom", "year": 2007, "users": 75.09},
+      {"country": "India", "year": 2007, "users": 3.95},
+      {"country": "Iceland", "year": 2007, "users": 90.6},
+      {"country": "Israel", "year": 2007, "users": 48.12806219},
+      {"country": "Italy", "year": 2007, "users": 40.79},
+      {"country": "Japan", "year": 2007, "users": 74.3},
+      {"country": "Kenya", "year": 2007, "users": 4.4},
+      {"country": "Mexico", "year": 2007, "users": 20.81},
+      {"country": "Norway", "year": 2007, "users": 86.93},
+      {"country": "New Zealand", "year": 2007, "users": 69.76},
+      {"country": "United States", "year": 2007, "users": 75},
+      {"country": "South Africa", "year": 2007, "users": 8.065375174},
+      {"country": "Argentina", "year": 2008, "users": 28.11262348},
+      {"country": "Brazil", "year": 2008, "users": 33.83},
+      {"country": "Canada", "year": 2008, "users": 76.7},
+      {"country": "Chile", "year": 2008, "users": 37.3},
+      {"country": "China", "year": 2008, "users": 22.6},
+      {"country": "Germany", "year": 2008, "users": 78},
+      {"country": "Algeria", "year": 2008, "users": 10.18},
+      {"country": "France", "year": 2008, "users": 70.68},
+      {"country": "United Kingdom", "year": 2008, "users": 78.39},
+      {"country": "India", "year": 2008, "users": 4.38},
+      {"country": "Iceland", "year": 2008, "users": 91},
+      {"country": "Israel", "year": 2008, "users": 59.39},
+      {"country": "Italy", "year": 2008, "users": 44.53},
+      {"country": "Japan", "year": 2008, "users": 75.4},
+      {"country": "Kenya", "year": 2008, "users": 5.2},
+      {"country": "Mexico", "year": 2008, "users": 21.71},
+      {"country": "Norway", "year": 2008, "users": 90.57},
+      {"country": "New Zealand", "year": 2008, "users": 72.03},
+      {"country": "United States", "year": 2008, "users": 74},
+      {"country": "South Africa", "year": 2008, "users": 8.43},
+      {"country": "Argentina", "year": 2009, "users": 34},
+      {"country": "Brazil", "year": 2009, "users": 39.22},
+      {"country": "Canada", "year": 2009, "users": 80.3},
+      {"country": "Chile", "year": 2009, "users": 41.56},
+      {"country": "China", "year": 2009, "users": 28.9},
+      {"country": "Germany", "year": 2009, "users": 79},
+      {"country": "Algeria", "year": 2009, "users": 11.23},
+      {"country": "France", "year": 2009, "users": 71.58},
+      {"country": "United Kingdom", "year": 2009, "users": 83.56},
+      {"country": "India", "year": 2009, "users": 5.12},
+      {"country": "Iceland", "year": 2009, "users": 93},
+      {"country": "Israel", "year": 2009, "users": 63.12},
+      {"country": "Italy", "year": 2009, "users": 48.83},
+      {"country": "Japan", "year": 2009, "users": 78},
+      {"country": "Kenya", "year": 2009, "users": 6.1},
+      {"country": "Mexico", "year": 2009, "users": 26.34},
+      {"country": "Norway", "year": 2009, "users": 92.08},
+      {"country": "New Zealand", "year": 2009, "users": 79.7},
+      {"country": "United States", "year": 2009, "users": 71},
+      {"country": "South Africa", "year": 2009, "users": 10},
+      {"country": "Argentina", "year": 2010, "users": 45},
+      {"country": "Brazil", "year": 2010, "users": 40.65},
+      {"country": "Canada", "year": 2010, "users": 80.3},
+      {"country": "Chile", "year": 2010, "users": 45},
+      {"country": "China", "year": 2010, "users": 34.3},
+      {"country": "Germany", "year": 2010, "users": 82},
+      {"country": "Algeria", "year": 2010, "users": 12.5},
+      {"country": "France", "year": 2010, "users": 77.28},
+      {"country": "United Kingdom", "year": 2010, "users": 85},
+      {"country": "India", "year": 2010, "users": 7.5},
+      {"country": "Iceland", "year": 2010, "users": 93.39},
+      {"country": "Israel", "year": 2010, "users": 67.5},
+      {"country": "Italy", "year": 2010, "users": 53.68},
+      {"country": "Japan", "year": 2010, "users": 78.21},
+      {"country": "Kenya", "year": 2010, "users": 7.2},
+      {"country": "Mexico", "year": 2010, "users": 31.05},
+      {"country": "Norway", "year": 2010, "users": 93.39},
+      {"country": "New Zealand", "year": 2010, "users": 80.46},
+      {"country": "United States", "year": 2010, "users": 71.69},
+      {"country": "South Africa", "year": 2010, "users": 24},
+      {"country": "Argentina", "year": 2011, "users": 51},
+      {"country": "Brazil", "year": 2011, "users": 45.69},
+      {"country": "Canada", "year": 2011, "users": 83},
+      {"country": "Chile", "year": 2011, "users": 52.24960729},
+      {"country": "China", "year": 2011, "users": 38.3},
+      {"country": "Germany", "year": 2011, "users": 81.26999954},
+      {"country": "Algeria", "year": 2011, "users": 14.9},
+      {"country": "France", "year": 2011, "users": 77.81999899},
+      {"country": "United Kingdom", "year": 2011, "users": 85.37999855},
+      {"country": "India", "year": 2011, "users": 10.07},
+      {"country": "Iceland", "year": 2011, "users": 94.8196868},
+      {"country": "Israel", "year": 2011, "users": 68.87387799},
+      {"country": "Italy", "year": 2011, "users": 54.3899983},
+      {"country": "Japan", "year": 2011, "users": 79.05411352},
+      {"country": "Kenya", "year": 2011, "users": 8.8},
+      {"country": "Mexico", "year": 2011, "users": 37.17629541},
+      {"country": "Norway", "year": 2011, "users": 93.48998265},
+      {"country": "New Zealand", "year": 2011, "users": 81.23},
+      {"country": "United States", "year": 2011, "users": 69.72946076},
+      {"country": "South Africa", "year": 2011, "users": 33.97},
+      {"country": "Argentina", "year": 2012, "users": 55.8},
+      {"country": "Brazil", "year": 2012, "users": 48.56},
+      {"country": "Canada", "year": 2012, "users": 83},
+      {"country": "Chile", "year": 2012, "users": 55.05},
+      {"country": "China", "year": 2012, "users": 42.30011749},
+      {"country": "Germany", "year": 2012, "users": 82.34999847},
+      {"country": "Algeria", "year": 2012, "users": 18.2},
+      {"country": "France", "year": 2012, "users": 81.44},
+      {"country": "United Kingdom", "year": 2012, "users": 87.47999842},
+      {"country": "India", "year": 2012, "users": 12.58006091},
+      {"country": "Iceland", "year": 2012, "users": 96.20979955},
+      {"country": "Israel", "year": 2012, "users": 70.8},
+      {"country": "Italy", "year": 2012, "users": 55.82999799},
+      {"country": "Japan", "year": 2012, "users": 79.4964},
+      {"country": "Kenya", "year": 2012, "users": 10.5},
+      {"country": "Mexico", "year": 2012, "users": 39.75},
+      {"country": "Norway", "year": 2012, "users": 94.64997805},
+      {"country": "New Zealand", "year": 2012, "users": 81.64447018},
+      {"country": "United States", "year": 2012, "users": 74.7},
+      {"country": "South Africa", "year": 2012, "users": 41},
+      {"country": "Argentina", "year": 2013, "users": 59.9},
+      {"country": "Brazil", "year": 2013, "users": 51.04},
+      {"country": "Canada", "year": 2013, "users": 85.8},
+      {"country": "Chile", "year": 2013, "users": 58},
+      {"country": "China", "year": 2013, "users": 45.8},
+      {"country": "Germany", "year": 2013, "users": 84.17},
+      {"country": "Algeria", "year": 2013, "users": 22.5},
+      {"country": "France", "year": 2013, "users": 81.9198},
+      {"country": "United Kingdom", "year": 2013, "users": 89.8441},
+      {"country": "India", "year": 2013, "users": 15.1},
+      {"country": "Iceland", "year": 2013, "users": 96.5468},
+      {"country": "Israel", "year": 2013, "users": 70.25031195},
+      {"country": "Italy", "year": 2013, "users": 58.4593},
+      {"country": "Japan", "year": 2013, "users": 88.21942891},
+      {"country": "Kenya", "year": 2013, "users": 13},
+      {"country": "Mexico", "year": 2013, "users": 43.46},
+      {"country": "Norway", "year": 2013, "users": 95.0534},
+      {"country": "New Zealand", "year": 2013, "users": 82.78},
+      {"country": "United States", "year": 2013, "users": 71.4},
+      {"country": "South Africa", "year": 2013, "users": 46.5},
+      {"country": "Argentina", "year": 2014, "users": 64.7},
+      {"country": "Brazil", "year": 2014, "users": 54.55100188},
+      {"country": "Canada", "year": 2014, "users": 87.12},
+      {"country": "Chile", "year": 2014, "users": 61.11},
+      {"country": "China", "year": 2014, "users": 47.9},
+      {"country": "Germany", "year": 2014, "users": 86.19},
+      {"country": "Algeria", "year": 2014, "users": 29.5},
+      {"country": "France", "year": 2014, "users": 83.75},
+      {"country": "United Kingdom", "year": 2014, "users": 91.61},
+      {"country": "India", "year": 2014, "users": 21},
+      {"country": "Iceland", "year": 2014, "users": 98.16},
+      {"country": "Israel", "year": 2014, "users": 75.01775316},
+      {"country": "Italy", "year": 2014, "users": 55.63846022},
+      {"country": "Japan", "year": 2014, "users": 89.10683302},
+      {"country": "Kenya", "year": 2014, "users": 16.5},
+      {"country": "Mexico", "year": 2014, "users": 44.39},
+      {"country": "Norway", "year": 2014, "users": 96.3},
+      {"country": "New Zealand", "year": 2014, "users": 85.5},
+      {"country": "United States", "year": 2014, "users": 73},
+      {"country": "South Africa", "year": 2014, "users": 49},
+      {"country": "Argentina", "year": 2015, "users": 68.04306411},
+      {"country": "Brazil", "year": 2015, "users": 58.32795173},
+      {"country": "Canada", "year": 2015, "users": 88.47},
+      {"country": "Chile", "year": 2015, "users": 64.289},
+      {"country": "China", "year": 2015, "users": 50.3},
+      {"country": "Germany", "year": 2015, "users": 87.5898},
+      {"country": "Algeria", "year": 2015, "users": 38.2},
+      {"country": "France", "year": 2015, "users": 84.6945},
+      {"country": "United Kingdom", "year": 2015, "users": 92.0003},
+      {"country": "India", "year": 2015, "users": 26},
+      {"country": "Iceland", "year": 2015, "users": 98.2},
+      {"country": "Israel", "year": 2015, "users": 77.35208966},
+      {"country": "Italy", "year": 2015, "users": 58.14173496},
+      {"country": "Japan", "year": 2015, "users": 91.05802839},
+      {"country": "Kenya", "year": 2015, "users": 21},
+      {"country": "Mexico", "year": 2015, "users": 57.43104299},
+      {"country": "Norway", "year": 2015, "users": 96.8103},
+      {"country": "New Zealand", "year": 2015, "users": 88.22288882},
+      {"country": "United States", "year": 2015, "users": 74.55420245},
+      {"country": "South Africa", "year": 2015, "users": 51.91911572},
+      {"country": "Argentina", "year": 2016, "users": 70.15076431},
+      {"country": "Brazil", "year": 2016, "users": 59.68274736},
+      {"country": "Canada", "year": 2016, "users": 89.84},
+      {"country": "Chile", "year": 2016, "users": 66.01},
+      {"country": "China", "year": 2016, "users": 53.2},
+      {"country": "Germany", "year": 2016, "users": 89.64710059},
+      {"country": "Algeria", "year": 2016, "users": 42.94552688},
+      {"country": "France", "year": 2016, "users": 85.62219995},
+      {"country": "United Kingdom", "year": 2016, "users": 94.77580063},
+      {"country": "India", "year": 2016, "users": 29.54716289},
+      {"country": "Iceland", "year": 2016, "users": 98.2400163},
+      {"country": "Israel", "year": 2016, "users": 79.77879126},
+      {"country": "Italy", "year": 2016, "users": 61.32425277},
+      {"country": "Japan", "year": 2016, "users": 92},
+      {"country": "Kenya", "year": 2016, "users": 26},
+      {"country": "Mexico", "year": 2016, "users": 59.540446},
+      {"country": "Norway", "year": 2016, "users": 97.29820367},
+      {"country": "New Zealand", "year": 2016, "users": 88.47018635},
+      {"country": "United States", "year": 2016, "users": 76.17673698},
+      {"country": "South Africa", "year": 2016, "users": 54}
+    ]
+  },
+  "mark": "rect",
+  "encoding": {
+    "x": {
+      "field": "year",
+      "type": "ordinal",
+      "title": "Year",
+      "axis": {"labelAngle": 90}
+    },
+    "y": {
+      "field": "country",
+      "type": "nominal",
+      "title": "Country",
+      "sort": {
+        "field": "users",
+        "op": "mean",
+        "order": "descending"
+      }
+    },
+    "color": {
+      "field": "users",
+      "type": "quantitative",
+      "title": "Internet Users (per 100 people)",
+      "scale": {
+        "scheme": "yellowgreenblue"
+      }
+    },
+    "tooltip": [
+      {"field": "country", "type": "nominal", "title": "Country"},
+      {"field": "year", "type": "ordinal", "title": "Year"},
+      {"field": "users", "type": "quantitative", "title": "Internet Users (per 100)", "format": ".2f"}
+    ]
+  },
+  "config": {
+    "view": {"stroke": null},
+    "axis": {"grid": true, "gridColor": "#e9e9e9"}
+  }
+}' |> as_vegaspec()
+```
+
+
+C. A problem with heat maps is how the data is "split" as this can drastically change how our data looks when compared to the "true" data.
+
+D. The problem with heat maps is not present here due to the fact of how granular the data cut up is. As well as the data cut up makes more sense for this heat map then the others.
+
+Exercise 4:
+
+A. Healy talks mostly about how us humans are much more adapt to telling the relative value of bars that start from 0 when compared to relative angles and area from Pie charts.
+
+B. Wilke has a slightly different approach giving certain conditions where a pie chart is more valuable then bar charts or stacked bar chars. The characteristics that need to be present for a pie chart to make sense as a choice is visualize simple fractions such as 1/2, clearly visualize the data as proportions of a whole, and looks visually appealing even for small datasets.
+
+C. Wile's alternatives for a pie chart are stacked bars, and side-by-side bars. Wilke suggests using stacked bars if it needs to clearly visualize the data proportions of a whole, or if it needs to work well for the visualization of many sets of proportions or time series proportions. Wilke suggest using side-by-side bars if you need easy visual comparisons of the relative proportions, works well when the whole has many pieces, or if you need it to look visually appealing even for small data sets.
+
+D.
+```{r}
+#| echo: false
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Pie chart showing seat distribution based on screenshot data",
+  "data": {
+    "values": [
+      {"Category": "CDU/CSU", "Value": 243},
+      {"Category": "FDP", "Value": 39},
+      {"Category": "SPD", "Value": 214}
+    ]
+  },
+  "mark": {"type": "arc", "tooltip": true},
+  "encoding": {
+    "theta": {"field": "Value", "type": "quantitative", "stack": "normalize"},
+    "color": {
+      "field": "Category",
+      "type": "nominal",
+      "scale": {
+        "domain": ["CDU/CSU", "FDP", "SPD"],
+        "range": ["#4c78a8", "#f58518", "#e45756"]
+      },
+      "legend": {"title": "Party"}
+    }
+  },
+  "view": {"stroke": null}
+}' |> as_vegaspec()
+```
+
