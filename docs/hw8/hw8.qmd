@@ -9,7 +9,6 @@ embed-resources: true
 Exercise 1:
 
 ```{r}
-#| echo: false
 library(vegawidget)
 
 spec1 <- '{
@@ -70,7 +69,6 @@ spec1 |> as_vegaspec()  # Basic lines
 spec3 |> as_vegaspec()  # Bar chart
 ```
 ```{r}
-#| echo: false
 library(vegawidget)
 
 # Side-by-side bar chart comparing Demand and Capacity - CORRECTED
@@ -137,7 +135,6 @@ spec_side_by_side <- '{
 spec_side_by_side |> as_vegaspec()
 ```
 ```{r}
-#| echo: false
 library(vegawidget)
 
 # Unmet Demand Line Graph
@@ -225,7 +222,6 @@ spec_unmet_demand <- '{
 spec_unmet_demand |> as_vegaspec()
 ```
 ```{r}
-#| echo: false
 library(vegawidget)
 
 # Demand as thinner bar above capacity bar
@@ -289,7 +285,6 @@ spec_demand_thinner_bar <- '{
 spec_demand_thinner_bar |> as_vegaspec()
 ```
 ```{r}
-#| echo: false
 library(vegawidget)
 
 # Only red connecting lines between demand and capacity points
@@ -377,3 +372,226 @@ spec_only_connecting_lines <- '{
 spec_only_connecting_lines |> as_vegaspec()
 ```
 
+Exercise 2:
+a.
+```{r}
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 600,
+  "height": 400,
+  "data": {
+    "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json"
+  },
+  "mark": {
+    "type": "line",
+    "point": true
+  },
+  "encoding": {
+    "x": {
+      "field": "year",
+      "type": "ordinal",
+      "title": "Year"
+    },
+    "y": {
+      "field": "perc",
+      "aggregate": "sum",
+      "type": "quantitative",
+      "title": "Total % of Workforce"
+    },
+    "color": {
+      "field": "sex",
+      "type": "nominal",
+      "title": "Sex"
+    },
+    "tooltip": [
+      {"field": "year", "type": "ordinal"},
+      {"field": "sex", "type": "nominal"},
+      {"field": "perc", "aggregate": "sum", "type": "quantitative", "title": "Total %"}
+    ]
+  }
+}' |> as_vegaspec()
+```
+The graphic reveals a trend towards an equal amount of men and women in the workforce. In 1850 it was almost 100% men but as time moves on the Women's share has continued to increase until it has seemingly reached a limit at around 49% which is as close to 50% without reaching it exactly. This demonstrates a trend overtime to more and more women entering the workforce probably due to cultural and political changes in the US.
+
+b.
+```{r}
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json"
+  },
+  "transform": [
+    {
+      "filter": {"field": "year", "oneOf": [1850, 1900, 1950, 2000]}
+    },
+    {
+      "pivot": "sex",
+      "groupby": ["job", "year"],
+      "value": "perc"
+    }
+  ],
+  "facet": {
+    "field": "year",
+    "type": "ordinal",
+    "title": "Year"
+  },
+  "columns": 2,
+  "spec": {
+    "width": 250,
+    "height": 250,
+    "mark": {"type": "point", "tooltip": true},
+    "encoding": {
+      "x": {
+        "field": "men",
+        "type": "quantitative",
+        "title": "Men",
+        "axis": {"format": ".0%"}
+      },
+      "y": {
+        "field": "women",
+        "type": "quantitative",
+        "title": "Women",
+        "axis": {"format": ".0%"}
+      },
+      "tooltip": [
+        {"field": "job", "type": "nominal", "title": "Job"},
+        {"field": "men", "type": "quantitative", "title": "Men", "format": ".0%"},
+        {"field": "women", "type": "quantitative", "title": "Women", "format": ".0%"}
+      ]
+    }
+  }
+}'|> as_vegaspec()
+```
+
+
+c.
+```{r}
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json"
+  },
+  "transform": [
+    {
+      "filter": {"field": "year", "oneOf": [1850, 1900, 1950, 2000]}
+    },
+    {
+      "joinaggregate": [{"op": "sum", "field": "count", "as": "total_count_job"}],
+      "groupby": ["job", "year"]
+    },
+    {
+      "calculate": "datum.count / datum.total_count_job",
+      "as": "perc_within_job"
+    }
+  ],
+  "facet": {
+    "field": "year",
+    "type": "ordinal",
+    "title": "Year"
+  },
+  "columns": 2,
+  "spec": {
+    "width": 300,
+    "height": 400,
+    "mark": {"type": "point", "tooltip": true},
+    "encoding": {
+      "x": {
+        "field": "perc_within_job",
+        "type": "quantitative",
+        "title": "Percent Within Job",
+        "axis": {"format": ".0%"}
+      },
+      "y": {
+        "field": "job",
+        "type": "nominal",
+        "title": "Job",
+        "sort": "-x",
+        "axis": {"labels": false}
+      },
+      "color": {
+        "field": "sex",
+        "type": "nominal",
+        "title": "Sex",
+        "scale": {
+          "domain": ["men", "women"],
+          "range": ["#1f77b4", "#e377c2"]
+        }
+      },
+      "tooltip": [
+        {"field": "job", "type": "nominal", "title": "Job"},
+        {"field": "sex", "type": "nominal", "title": "Sex"},
+        {"field": "perc_within_job", "type": "quantitative", "title": "Percent", "format": ".0%"}
+      ]
+    }
+  }
+}' |> as_vegaspec()
+```
+
+
+Exercise 3:
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(vegawidget)
+library(countrycode)
+
+# Wrangle - use values_transform to force all year columns to numeric
+gas <- read_csv("pump_price_for_gasoline_us_per_liter.csv") |>
+  pivot_longer(-country, names_to = "year", values_to = "price_per_liter",
+               values_transform = list(price_per_liter = as.numeric)) |>
+  mutate(
+    year = as.integer(year),
+    price_per_gallon = price_per_liter * 3.78541,
+    iso3  = countrycode(country, "country.name", "iso3c"),
+    region = countrycode(country, "country.name", "region")
+  ) |>
+  filter(year == 2016)
+
+# Vega-Lite spec as JSON string
+spec_json <- paste0('{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Gas Prices by Country (2016)",
+    "subtitle": "USD per gallon. Each dot is one country; hover for details."
+  },
+  "width": 700,
+  "height": 400,
+  "data": {"values": ', jsonlite::toJSON(gas, auto_unbox = TRUE), '},
+  "mark": {"type": "point", "filled": true, "opacity": 0.8},
+  "encoding": {
+    "x": {
+      "field": "price_per_gallon",
+      "type": "quantitative",
+      "title": "Price (USD per gallon)",
+      "axis": {"format": "$,.2f"}
+    },
+    "y": {
+      "field": "region",
+      "type": "nominal",
+      "title": "Region",
+      "sort": "-x"
+    },
+    "color": {
+      "field": "region",
+      "type": "nominal",
+      "legend": null
+    },
+    "tooltip": [
+      {"field": "country", "type": "nominal", "title": "Country"},
+      {"field": "iso3", "type": "nominal", "title": "Code"},
+      {"field": "region", "type": "nominal", "title": "Region"},
+      {"field": "price_per_gallon", "type": "quantitative", "title": "$/gallon", "format": "$,.2f"}
+    ]
+  }
+}')
+
+as_vegaspec(spec_json)
+```
+
+From the graphic as there is no Null row it appears that every country was givin a continent so no NA values were givin for continent.
