@@ -9,9 +9,367 @@ code-tools: true
 
 Exercise 1:
 
+a.
+A plot I really like from our homework 4 gallery is Student 2's graphic comparing kits. I feel like this graphic makes it very easy to see the differences in the proportion for each genetic region and how they differ from test to test. I also like how the graphic leaves out any zero values. Which makes the graph much less cluttered and follows Tufte's view on using as little ink as possible.
+
+b. 
+A plot I don't like is Student 7's graphic comparing kits. In my opinion, the biggest drawback is its interpretability. This is because most of the data is mapped to color or shape, most of the points likely overlap, making it nearly impossible to distinguish between them.
+
+c/d.
+```{r}
+#| code-fold: true 
+library(vegawidget)
+'{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Simularities in regional genetic share between twin sets",
+    "subtitle": "Click a region in the legend to highlight it",
+    "fontSize": 16,
+    "subtitleFontSize": 12,
+    "subtitleColor": "#666"
+  },
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/twins-genetics-long.json"
+  },
+  "width": 400,
+  "height": 300,
+  "params": [
+    {
+      "name": "regionSelect",
+      "select": {
+        "type": "point",
+        "fields": ["region"]
+      },
+      "bind": "legend"
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "twin",
+      "type": "nominal",
+      "title": "Individual Twins"
+    },
+    "y": {
+      "aggregate": "mean",
+      "field": "genetic share",
+      "type": "quantitative",
+      "title": "Mean  Genetic  Share",
+      "stack": "normalize",
+      "axis": {"format": ".0%"}
+    },
+    "color": {
+      "field": "region",
+      "type": "nominal",
+      "title": "Ancestry Region",
+      "scale": {"scheme": "tableau20"}
+    },
+    "opacity": {
+      "condition": {"param": "regionSelect", "value": 1},
+      "value": 0.15
+    },
+    "tooltip": [
+      {"field": "twin", "type": "nominal", "title": "Twin"},
+      {"field": "region", "type": "nominal", "title": "Region"},
+      {"aggregate": "mean", "field": "genetic share", "type": "quantitative", "title": "Mean Share", "format": ".3f"}
+    ]
+  }
+}' |> as_vegaspec()
+```
+"
+The stacked-bars graphic shows how consistent the genetic ancestry composition is across all six twin sets (A and B). Each bar represents one individual twin, and the stacked segments show the proportional breakdown of their ancestry by region, normalized to 100% for easy comparison. All of the twin pairs have nearly identical ancestral region proportions, indicating almost no difference in ancestry between them.
+```{r}
+#| code-fold: true
+library(vegawidget)
+
+make_panel <- function(pair_num, show_x_title) {
+  list(
+    width = 168,
+    height = 180,
+    title = paste("Twin Pair", pair_num),
+    data = list(
+      url = "https://calvin-data304.netlify.app/data/twins-genetics-long.json"
+    ),
+    transform = list(
+      list(filter = paste0("datum.pair == ", pair_num))
+    ),
+    mark = list(type = "line", point = TRUE),
+    encoding = list(
+      x = list(
+        field = "kit", type = "nominal",
+        title = if (show_x_title) "DNA Kit" else NULL,
+        axis = list(labelAngle = -45, titleFontSize = 16, titleFont = "sans-serif")
+      ),
+      y = list(
+        aggregate = "mean", field = "genetic share",
+        type = "quantitative",
+        title = NULL,
+        axis = list(title = NULL)
+      ),
+      color = list(field = "region", type = "nominal", title = "Region",
+                   scale = list(scheme = "tableau20")),
+      tooltip = list(
+        list(field = "kit", type = "nominal", title = "Kit"),
+        list(field = "region", type = "nominal", title = "Region"),
+        list(aggregate = "mean", field = "genetic share",
+             type = "quantitative", title = "Mean Share", format = ".3f")
+      )
+    )
+  )
+}
+
+y_label <- list(
+  width = 20,
+  height = 460,
+  view = list(stroke = "transparent", fill = "transparent"),
+  data = list(values = list(list(x = 0, y = 0))),
+  mark = list(
+    type = "text",
+    text = "Mean Genetic Share",
+    angle = 270,
+    fontSize = 16,
+    color = "#333",
+    font = "sans-serif",
+    fontWeight = "bold"
+  ),
+  encoding = list(
+    x = list(value = 10),
+    y = list(value = 235)
+  )
+)
+
+spec <- as_vegaspec(
+  list(
+    `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
+    title = list(
+      text = "Differences in Kit Tests and Genetic Region",
+      fontSize = 16
+    ),
+    hconcat = list(
+      y_label,
+      list(
+        vconcat = list(
+          list(
+            hconcat = list(
+              make_panel(1, show_x_title = FALSE),
+              make_panel(2, show_x_title = FALSE),
+              make_panel(3, show_x_title = FALSE)
+            )
+          ),
+          list(
+            hconcat = list(
+              make_panel(4, show_x_title = FALSE),
+              make_panel(5, show_x_title = TRUE),
+              make_panel(6, show_x_title = FALSE)
+            )
+          )
+        )
+      )
+    )
+  )
+)
+
+spec
+```
+The line graphic shows how each DNA kit (Ancestry, 23andMe, and MyHeritage) estimates the genetic share for each ancestry region across all six twin pairs. Each panel represents one twin pair, with lines connecting the three kit estimates for each region, allowing direct comparison of how consistently the kits agree. Across most twin pairs, the kits show noticeable disagreement for certain regions. Lines with steep slopes indicate that two kits produced very different estimates for the same ancestry region. Some regions remain flat and stable across all three kits, while others fluctuate considerably, suggesting that certain ancestry regions are harder for kits to estimate consistently than others.
+
 Exercise 2:
+Challenge #3
+```{r}
+#| code-fold: true
+library(tidyverse)
+library(vegawidget)
+
+# Read all sheets
+nps_breakdown <- readxl::read_excel("swd-lets-practice-ex-7-06.xlsx", sheet = "nps breakdown") |>
+  rename(month_label = month)
+
+top_competitors <- readxl::read_excel("swd-lets-practice-ex-7-06.xlsx", sheet = "top competitors") |>
+  rename(month_label = month)
+
+feb_2020 <- readxl::read_excel("swd-lets-practice-ex-7-06.xlsx", sheet = "competitors' nps (feb 2020)")
+
+# --- Graphic 1: NPS over time vs competitors ---
+our_nps <- nps_breakdown |>
+  select(month_label, `OUR BUSINESS` = NPS)
+
+comp_long <- top_competitors |>
+  left_join(our_nps, by = "month_label") |>
+  pivot_longer(-month_label, names_to = "company", values_to = "nps") |>
+  mutate(month_label = as.character(month_label))
+
+spec1 <- as_vegaspec(list(
+  `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
+  title = list(text = "NPS Over Time: Our Business vs Top Competitors", fontSize = 15),
+  width = 550, height = 300,
+  data = list(values = jsonlite::fromJSON(jsonlite::toJSON(comp_long))),
+  mark = list(type = "line", point = TRUE),
+  encoding = list(
+    x = list(field = "month_label", type = "nominal", title = "Month",
+             sort = as.character(unique(comp_long$month_label)),
+             axis = list(labelAngle = -45)),
+    y = list(field = "nps", type = "quantitative", title = "NPS",
+             scale = list(domain = list(0, 60))),
+    color = list(
+      field = "company", type = "nominal", title = "Company",
+      scale = list(
+        domain = as.list(c("OUR BUSINESS", "Competitor A", "Competitor B", "Competitor C", "Competitor D")),
+        range  = as.list(c("#e15759", "#aec7e8", "#aec7e8", "#aec7e8", "#aec7e8"))
+      )
+    ),
+    size = list(
+      field = "company", type = "nominal",
+      scale = list(
+        domain = as.list(c("OUR BUSINESS", "Competitor A", "Competitor B", "Competitor C", "Competitor D")),
+        range  = as.list(c(3, 1, 1, 1, 1))
+      ),
+      legend = NULL
+    ),
+    tooltip = list(
+      list(field = "month_label", type = "nominal",      title = "Month"),
+      list(field = "company",     type = "nominal",      title = "Company"),
+      list(field = "nps",         type = "quantitative", title = "NPS")
+    )
+  )
+))
+
+# --- Graphic 2: February 2020 industry snapshot ---
+feb_long <- feb_2020 |>
+  mutate(ours = business == "OUR BUSINESS")
+
+spec2 <- as_vegaspec(list(
+  `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
+  title = list(text = "Industry NPS Comparison — February 2020", fontSize = 15),
+  width = 400, height = 350,
+  data = list(values = jsonlite::fromJSON(jsonlite::toJSON(feb_long))),
+  mark = list(type = "bar", cornerRadiusEnd = 3),
+  encoding = list(
+    y = list(field = "business", type = "nominal", title = NULL, sort = "-x"),
+    x = list(field = "nps", type = "quantitative", title = "NPS Score",
+             scale = list(domain = list(0, 55))),
+    color = list(
+      field = "ours", type = "nominal",
+      scale = list(domain = list(TRUE, FALSE), range = list("#e15759", "#aec7e8")),
+      legend = NULL
+    ),
+    tooltip = list(
+      list(field = "business", type = "nominal",      title = "Business"),
+      list(field = "nps",      type = "quantitative", title = "NPS")
+    )
+  )
+))
+
+# --- Graphic 3: NPS component breakdown over time ---
+breakdown_long <- nps_breakdown |>
+  select(month_label, Detractor, Passive, Promoter) |>
+  pivot_longer(-month_label, names_to = "category", values_to = "share") |>
+  mutate(month_label = as.character(month_label))
+
+spec3 <- as_vegaspec(list(
+  `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
+  title = list(text = "NPS Component Breakdown Over Time — Our Business", fontSize = 15),
+  width = 550, height = 280,
+  data = list(values = jsonlite::fromJSON(jsonlite::toJSON(breakdown_long))),
+  mark = list(type = "bar"),
+  encoding = list(
+    x = list(field = "month_label", type = "nominal", title = "Month",
+             sort = as.character(unique(breakdown_long$month_label)),
+             axis = list(labelAngle = -45)),
+    y = list(field = "share", type = "quantitative", title = "Share",
+             stack = "normalize", axis = list(format = ".0%")),
+    color = list(
+      field = "category", type = "nominal", title = "Category",
+      scale = list(
+        domain = list("Promoter", "Passive", "Detractor"),
+        range  = list("#59a14f", "#f1ce63", "#e15759")
+      )
+    ),
+    tooltip = list(
+      list(field = "month_label", type = "nominal",      title = "Month"),
+      list(field = "category",    type = "nominal",      title = "Category"),
+      list(field = "share",       type = "quantitative", title = "Share", format = ".1%")
+    )
+  )
+))
+
+spec1
+spec2
+spec3
+```
+
 
 Exercise 3:
+```{r}
+#| code-fold: true
+library(tidyverse)
+library(vegawidget)
+
+tanzania <- read_csv("tanzania_dhs.csv")
+
+# Pivot to long for a multi-series line chart
+tanzania_long <- tanzania |>
+  pivot_longer(
+    cols = c(total_fertility_rate, contraception_pct, unmet_need_pct),
+    names_to = "indicator",
+    values_to = "value"
+  ) |>
+  mutate(indicator = recode(indicator,
+    total_fertility_rate = "Total Fertility Rate",
+    contraception_pct    = "Contraception Use (%)",
+    unmet_need_pct       = "Unmet Need for Family Planning (%)"
+  ))
+
+spec <- as_vegaspec(list(
+  `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
+  title = list(
+    text     = "Reproductive Health Trends in Tanzania, 1991–2016",
+    subtitle = "Source: Demographic and Health Surveys, Various Years",
+    fontSize        = 16,
+    subtitleFontSize = 11,
+    subtitleColor   = "#888"
+  ),
+  width  = 550,
+  height = 320,
+  data   = list(values = jsonlite::fromJSON(jsonlite::toJSON(tanzania_long))),
+  mark   = list(type = "line", point = list(filled = TRUE, size = 80)),
+  encoding = list(
+    x = list(
+      field = "year_midpoint",
+      type  = "quantitative",
+      title = "Survey Year",
+      axis  = list(
+        values    = as.list(tanzania$year_midpoint),
+        labelExpr = "datum.value == 1991.5 ? '1991-1992' : datum.value == 2004.5 ? '2004-2005' : datum.value == 2015.5 ? '2015-2016' : toString(datum.value)",
+        labelAngle = -35,
+        titleFontSize = 12
+      )
+    ),
+    y = list(
+      field = "value",
+      type  = "quantitative",
+      title = "Value",
+      axis  = list(titleFontSize = 12)
+    ),
+    color = list(
+      field = "indicator",
+      type  = "nominal",
+      title = "Indicator",
+      scale = list(
+        domain = list("Total Fertility Rate", "Contraception Use (%)", "Unmet Need for Family Planning (%)"),
+        range  = list("#e15759", "#4e79a7", "#f28e2b")
+      )
+    ),
+    tooltip = list(
+      list(field = "survey_year",  type = "nominal",      title = "Survey Year"),
+      list(field = "indicator",    type = "nominal",      title = "Indicator"),
+      list(field = "value",        type = "quantitative", title = "Value", format = ".1f")
+    )
+  )
+))
+
+spec
+```
+
 
 Exercise 4:
 
