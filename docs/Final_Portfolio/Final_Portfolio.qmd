@@ -25,7 +25,7 @@ library(vegawidget)
 '{
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Simularities in regional genetic share between twin sets",
+    "text": "Similarities in regional genetic share between twin sets",
     "subtitle": "Click a region in the legend to highlight it",
     "fontSize": 16,
     "subtitleFontSize": 12,
@@ -415,7 +415,7 @@ spec <- as_vegaspec(list(
 spec
 ```
 
-Tanzania's reproductive health data from 1991 to 2016 tells the story of a nation beginning its transition toward greater development. In economics, we often explore how the poverty trap can be overcome through a reduction in the total fertility rate and increased contraception use. Tanzania appears to be right on track, as over the past 25 years contraception use has increased by more than 30% and the total fertility rate has dropped by a full child per woman. This could be the beginning of a period of significant economic development for Tanzania.
+Tanzania's reproductive health data from 1991 to 2016 tells the story of a nation beginning its transition toward greater development. In economics, we often explore how the poverty trap can be overcome through a reduction in the total fertility rate and increased contraception use. Tanzania appears to be right on track, as over the past 25 years contraception use has increased by more than 30% and the total fertility rate has dropped by a full child per woman. This could be the beginning of a period of significant economic development for Tanzania. Although there is an interesting trend that the unmet need for family planning is staying steady even as conception rises indicating a potential issue further down the line.
 
 Exercise 4:
 ```{r}
@@ -594,7 +594,7 @@ In Exercise 4, I added text annotation layers directly onto the scatter plot to 
 
 b.
 
-1. Maximizing Data-Ink Ratio — Tufte (2001),
+1. Maximizing Data-Ink Ratio — Tufte (2001), pg. 105
 
 Tufte argues that non-data ink should be removed wherever possible to let the data speak for itself. In Exercise 4, I removed gridlines from the default style, used a transparent background, and kept the axis lines thin so that every element of ink on the chart encodes information rather than decoration. In Exercise 1's stacked bar chart, I omitted zero values entirely to reduce clutter, which I felt followed Tufte's principle of not drawing anything that adds nothing to the reader's understanding.
 
@@ -602,6 +602,6 @@ Tufte argues that non-data ink should be removed wherever possible to let the da
 
 Wilke distinguishes between qualitative, sequential, and diverging color scales and warns against using color arbitrarily. In Exercise 4, I used color to encode a meaningful qualitative category, specifically league finish zone, with blue reserved for top finishers and red for relegated teams, which I felt maps intuitively to good and bad outcomes. In Exercise 2, I used red exclusively for our business and a neutral light blue for all competitors, so that the color carries a clear signal to the reader rather than just distinguishing categories for the sake of it.
 
-3. Avoiding Chartjunk — Tufte (2001),
+3. Avoiding Chartjunk — Tufte (2001), pg. 107
 
 Tufte defines chartjunk as visual elements that clutter a graphic without adding information, including unnecessary tick marks, heavy grid lines, and decorative fills. In Exercise 3, I hid the x-axis on the top panel entirely since the bottom panel already carries the shared axis labels, which I felt avoided redundant ink and kept the two panels feeling connected. Across all of my exercises, I suppressed legends where the color mapping was self-evident from context and kept axis titles short, only including them where I felt they were necessary for the reader to understand the chart.
