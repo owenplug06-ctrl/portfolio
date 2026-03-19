@@ -372,6 +372,280 @@ spec
 
 
 Exercise 4:
+```{r}
+#| code-fold: true
+library(tidyverse)
+library(vegawidget)
+
+spec <- as_vegaspec(list({
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "title": {
+    "text": "The Price of Talent: Soccer Player Market Values",
+    "subtitle": [
+      "Source: Transfermarkt (transfermarkt.com), 2024–25 season estimates.",
+      "Top 5 European leagues · market values in €M · hover any mark for details"
+    ],
+    "fontSize": 16,
+    "subtitleFontSize": 12,
+    "subtitleColor": "#73726c",
+    "anchor": "start",
+    "offset": 12
+  },
+  "data": {
+    "url": "players.csv",
+    "format": {"type": "csv"}
+  },
+  "transform": [
+    {"calculate": "toNumber(datum.market_value_m)",  "as": "value"},
+    {"calculate": "toNumber(datum.peak_value_m)",    "as": "peak"},
+    {"calculate": "toNumber(datum.age)",             "as": "age_n"},
+    {"calculate": "datum.value / datum.peak",        "as": "retention"}
+  ],
+  "vconcat": [
+    {
+      "title": {
+        "text": "Market value vs. age — the career peak curve",
+        "fontSize": 13,
+        "anchor": "start",
+        "offset": 8
+      },
+      "width": 580,
+      "height": 280,
+      "layer": [
+        {
+          "mark": {
+            "type": "point",
+            "filled": true,
+            "opacity": 0.75,
+            "stroke": "white",
+            "strokeWidth": 0.6
+          },
+          "encoding": {
+            "x": {
+              "field": "age_n",
+              "type": "quantitative",
+              "title": "Age",
+              "scale": {"domain": [15, 39]},
+              "axis": {"tickCount": 12, "grid": true, "gridColor": "#e8e6e0", "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
+            },
+            "y": {
+              "field": "value",
+              "type": "quantitative",
+              "title": "Market Value (€M)",
+              "scale": {"domain": [0, 200]},
+              "axis": {"tickCount": 5, "grid": true, "gridColor": "#e8e6e0", "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
+            },
+            "size": {
+              "field": "value",
+              "type": "quantitative",
+              "scale": {"range": [40, 600]},
+              "legend": null
+            },
+            "color": {
+              "field": "position_group",
+              "type": "nominal",
+              "title": "Position",
+              "scale": {
+                "domain": ["Attack", "Midfield", "Defender", "Goalkeeper"],
+                "range": ["#E24B4A", "#378ADD", "#1D9E75", "#BA7517"]
+              },
+              "legend": {
+                "orient": "top-left",
+                "direction": "horizontal",
+                "titleFontSize": 11,
+                "labelFontSize": 11,
+                "symbolSize": 90,
+                "offset": 4
+              }
+            },
+            "tooltip": [
+              {"field": "name",           "title": "Player"},
+              {"field": "club",           "title": "Club"},
+              {"field": "league",         "title": "League"},
+              {"field": "position",       "title": "Position"},
+              {"field": "age",            "title": "Age"},
+              {"field": "market_value_m", "title": "Value (€M)"},
+              {"field": "peak_value_m",   "title": "Peak Value (€M)"},
+              {"field": "country_of_citizenship", "title": "Nationality"}
+            ]
+          }
+        },
+        {
+          "mark": {
+            "type": "line",
+            "color": "#3d3d3a",
+            "strokeWidth": 2,
+            "opacity": 0.5,
+            "strokeDash": [5, 3]
+          },
+          "transform": [
+            {"loess": "value", "on": "age_n", "bandwidth": 0.5}
+          ],
+          "encoding": {
+            "x": {"field": "age_n", "type": "quantitative"},
+            "y": {"field": "value", "type": "quantitative"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "dy": -10,
+            "fontSize": 10,
+            "fontWeight": 500,
+            "color": "#3d3d3a"
+          },
+          "transform": [{"filter": "datum.value >= 150"}],
+          "encoding": {
+            "x":    {"field": "age_n", "type": "quantitative"},
+            "y":    {"field": "value", "type": "quantitative"},
+            "text": {"field": "name",  "type": "nominal"}
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "text": "Average market value by position and league",
+        "fontSize": 13,
+        "anchor": "start",
+        "offset": 8
+      },
+      "width": 580,
+      "height": 210,
+      "transform": [
+        {
+          "aggregate": [
+            {"op": "mean",  "field": "value", "as": "avg_value"},
+            {"op": "count", "field": "name",  "as": "n_players"}
+          ],
+          "groupby": ["league", "position_group"]
+        }
+      ],
+      "mark": {"type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3},
+      "encoding": {
+        "x": {
+          "field": "league",
+          "type": "nominal",
+          "title": null,
+          "sort": ["Premier League", "La Liga", "Bundesliga", "Serie A", "Ligue 1"],
+          "axis": {"labelFontSize": 11, "labelColor": "#3d3d3a", "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
+        },
+        "xOffset": {
+          "field": "position_group",
+          "type": "nominal",
+          "sort": ["Attack", "Midfield", "Defender", "Goalkeeper"]
+        },
+        "y": {
+          "field": "avg_value",
+          "type": "quantitative",
+          "title": "Avg market value (€M)",
+          "axis": {"grid": true, "gridColor": "#e8e6e0", "tickCount": 5, "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
+        },
+        "color": {
+          "field": "position_group",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Attack", "Midfield", "Defender", "Goalkeeper"],
+            "range": ["#E24B4A", "#378ADD", "#1D9E75", "#BA7517"]
+          },
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "league",         "title": "League"},
+          {"field": "position_group", "title": "Position group"},
+          {"field": "avg_value",      "title": "Avg value (€M)", "format": ".1f"},
+          {"field": "n_players",      "title": "# Players"}
+        ]
+      }
+    },
+    {
+      "title": {
+        "text": "Current value vs. peak career value — who has depreciated?",
+        "fontSize": 13,
+        "anchor": "start",
+        "offset": 8
+      },
+      "width": 580,
+      "height": 260,
+      "layer": [
+        {
+          "data": {"values": [{"x": 0, "y": 0}, {"x": 200, "y": 200}]},
+          "mark": {"type": "line", "strokeDash": [5, 3], "color": "#b4b2a9", "strokeWidth": 1},
+          "encoding": {
+            "x": {"field": "x", "type": "quantitative"},
+            "y": {"field": "y", "type": "quantitative"}
+          }
+        },
+        {
+          "mark": {
+            "type": "point",
+            "filled": true,
+            "opacity": 0.75,
+            "stroke": "white",
+            "strokeWidth": 0.5
+          },
+          "encoding": {
+            "x": {
+              "field": "peak",
+              "type": "quantitative",
+              "title": "Peak career value (€M)",
+              "scale": {"domain": [0, 200]},
+              "axis": {"grid": true, "gridColor": "#e8e6e0", "tickCount": 5, "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
+            },
+            "y": {
+              "field": "value",
+              "type": "quantitative",
+              "title": "Current value (€M)",
+              "scale": {"domain": [0, 200]},
+              "axis": {"grid": true, "gridColor": "#e8e6e0", "tickCount": 5, "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
+            },
+            "size": {
+              "field": "age_n",
+              "type": "quantitative",
+              "scale": {"range": [30, 300]},
+              "legend": {"title": "Age", "orient": "bottom-right", "titleFontSize": 10, "labelFontSize": 10}
+            },
+            "color": {
+              "field": "retention",
+              "type": "quantitative",
+              "title": "Value retained",
+              "scale": {"domain": [0.1, 1.0], "scheme": "redyellowgreen"},
+              "legend": {
+                "orient": "right",
+                "titleFontSize": 11,
+                "labelFontSize": 10,
+                "gradientLength": 110,
+                "format": ".0%"
+              }
+            },
+            "tooltip": [
+              {"field": "name",           "title": "Player"},
+              {"field": "club",           "title": "Club"},
+              {"field": "age",            "title": "Age"},
+              {"field": "peak_value_m",   "title": "Peak value (€M)"},
+              {"field": "market_value_m", "title": "Current value (€M)"},
+              {"field": "retention",      "title": "Value retained", "format": ".0%"}
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "config": {
+    "font": "system-ui, sans-serif",
+    "background": "transparent",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 11,
+      "titleFontSize": 11,
+      "titleColor": "#73726c",
+      "labelColor": "#73726c"
+    },
+    "title": {"color": "#3d3d3a", "subtitleColor": "#73726c"}
+  }
+})
+spec
+```
 
 Exercise 5:
 
