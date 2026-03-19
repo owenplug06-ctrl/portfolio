@@ -1,19 +1,22 @@
 ---
-title: "Final_Portfolio"
+title: "Final Portfolio"
 format: 
   html:
     output-file: "index"
 embed-resources: true
 code-tools: true
+execute:
+  message: false
+  warning: false
 ---
 
 Exercise 1:
 
 a.
-A plot I really like from our homework 4 gallery is Student 2's graphic comparing kits. I feel like this graphic makes it very easy to see the differences in the proportion for each genetic region and how they differ from test to test. I also like how the graphic leaves out any zero values. Which makes the graph much less cluttered and follows Tufte's view on using as little ink as possible.
+A plot I really like from the homework 4 gallery is Student 2's graphic comparing kits. This graphic makes it very easy to see the differences in the proportion for each genetic region and how they differ from test to test. I also appreciate how the graphic omits any zero values, which makes the chart much less cluttered and follows Tufte's principle of minimizing non-data ink.
 
 b. 
-A plot I don't like is Student 7's graphic comparing kits. In my opinion, the biggest drawback is its interpretability. This is because most of the data is mapped to color or shape, most of the points likely overlap, making it nearly impossible to distinguish between them.
+A plot I don't like is Student 7's graphic comparing kits. In my opinion, the biggest drawback is its lack of interpretability. Most of the data is mapped to color or shape, and because the points likely overlap heavily, it becomes nearly impossible to distinguish between them.
 
 c/d.
 ```{r}
@@ -76,7 +79,7 @@ library(vegawidget)
   }
 }' |> as_vegaspec()
 ```
-"
+
 The stacked-bars graphic shows how consistent the genetic ancestry composition is across all six twin sets (A and B). Each bar represents one individual twin, and the stacked segments show the proportional breakdown of their ancestry by region, normalized to 100% for easy comparison. All of the twin pairs have nearly identical ancestral region proportions, indicating almost no difference in ancestry between them.
 ```{r}
 #| code-fold: true
@@ -128,7 +131,7 @@ y_label <- list(
     text = "Mean Genetic Share",
     angle = 270,
     fontSize = 16,
-    color = "#333",
+    color = "black",
     font = "sans-serif",
     fontWeight = "bold"
   ),
@@ -141,10 +144,6 @@ y_label <- list(
 spec <- as_vegaspec(
   list(
     `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
-    title = list(
-      text = "Differences in Kit Tests and Genetic Region",
-      fontSize = 16
-    ),
     hconcat = list(
       y_label,
       list(
@@ -177,8 +176,12 @@ Exercise 2:
 Challenge #3
 ```{r}
 #| code-fold: true
-library(tidyverse)
-library(vegawidget)
+#| message: false
+#| warning: false
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(vegawidget)
+})
 
 # Read all sheets
 nps_breakdown <- readxl::read_excel("swd-lets-practice-ex-7-06.xlsx", sheet = "nps breakdown") |>
@@ -214,7 +217,7 @@ spec1 <- as_vegaspec(list(
       field = "company", type = "nominal", title = "Company",
       scale = list(
         domain = as.list(c("OUR BUSINESS", "Competitor A", "Competitor B", "Competitor C", "Competitor D")),
-        range  = as.list(c("#e15759", "#aec7e8", "#aec7e8", "#aec7e8", "#aec7e8"))
+        range  = as.list(c("red", "lightblue", "lightblue", "lightblue", "lightblue"))
       )
     ),
     size = list(
@@ -249,7 +252,7 @@ spec2 <- as_vegaspec(list(
              scale = list(domain = list(0, 55))),
     color = list(
       field = "ours", type = "nominal",
-      scale = list(domain = list(TRUE, FALSE), range = list("#e15759", "#aec7e8")),
+      scale = list(domain = list(TRUE, FALSE), range = list("red", "grey")),
       legend = NULL
     ),
     tooltip = list(
@@ -267,7 +270,6 @@ breakdown_long <- nps_breakdown |>
 
 spec3 <- as_vegaspec(list(
   `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
-  title = list(text = "NPS Component Breakdown Over Time — Our Business", fontSize = 15),
   width = 550, height = 280,
   data = list(values = jsonlite::fromJSON(jsonlite::toJSON(breakdown_long))),
   mark = list(type = "bar"),
@@ -281,7 +283,7 @@ spec3 <- as_vegaspec(list(
       field = "category", type = "nominal", title = "Category",
       scale = list(
         domain = list("Promoter", "Passive", "Detractor"),
-        range  = list("#59a14f", "#f1ce63", "#e15759")
+        range  = list("green", "yellow", "red")
       )
     ),
     tooltip = list(
@@ -299,77 +301,121 @@ spec3
 
 
 Exercise 3:
+
+[Tanzania data](tanzania_dhs.csv)
+
 ```{r}
 #| code-fold: true
 library(tidyverse)
 library(vegawidget)
 
-tanzania <- read_csv("tanzania_dhs.csv")
+tanzania <- read_csv("tanzania_dhs.csv", show_col_types = FALSE)
 
-# Pivot to long for a multi-series line chart
-tanzania_long <- tanzania |>
+tanzania_tfr <- tanzania |>
+  select(year_midpoint, survey_year, total_fertility_rate)
+
+tanzania_other <- tanzania |>
   pivot_longer(
-    cols = c(total_fertility_rate, contraception_pct, unmet_need_pct),
+    cols = c(contraception_pct, unmet_need_pct),
     names_to = "indicator",
     values_to = "value"
   ) |>
   mutate(indicator = recode(indicator,
-    total_fertility_rate = "Total Fertility Rate",
-    contraception_pct    = "Contraception Use (%)",
-    unmet_need_pct       = "Unmet Need for Family Planning (%)"
+    contraception_pct = "Contraception Use (%)",
+    unmet_need_pct    = "Unmet Need for Family Planning (%)"
   ))
+
+x_axis <- list(
+  values     = as.list(tanzania$year_midpoint),
+  labelExpr  = "datum.value == 1991.5 ? '1991-1992' : datum.value == 2004.5 ? '2004-2005' : datum.value == 2015.5 ? '2015-2016' : toString(datum.value)",
+  labelAngle = -35,
+  titleFontSize = 12
+)
 
 spec <- as_vegaspec(list(
   `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
-  title = list(
-    text     = "Reproductive Health Trends in Tanzania, 1991–2016",
-    subtitle = "Source: Demographic and Health Surveys, Various Years",
-    fontSize        = 16,
-    subtitleFontSize = 11,
-    subtitleColor   = "#888"
-  ),
-  width  = 550,
-  height = 320,
-  data   = list(values = jsonlite::fromJSON(jsonlite::toJSON(tanzania_long))),
-  mark   = list(type = "line", point = list(filled = TRUE, size = 80)),
-  encoding = list(
-    x = list(
-      field = "year_midpoint",
-      type  = "quantitative",
-      title = "Survey Year",
-      axis  = list(
-        values    = as.list(tanzania$year_midpoint),
-        labelExpr = "datum.value == 1991.5 ? '1991-1992' : datum.value == 2004.5 ? '2004-2005' : datum.value == 2015.5 ? '2015-2016' : toString(datum.value)",
-        labelAngle = -35,
-        titleFontSize = 12
+  title = "Reproductive Health Trends in Tanzania",
+  vconcat = list(
+
+    list(
+      width  = 500,
+      height = 180,
+      data   = list(values = jsonlite::fromJSON(jsonlite::toJSON(tanzania_tfr))),
+      mark   = list(type = "line", point = list(filled = TRUE, size = 80)),
+      encoding = list(
+        x = list(
+          field = "year_midpoint",
+          type  = "quantitative",
+          title = NULL,
+          axis  = NULL
+        ),
+        y = list(
+          field = "total_fertility_rate",
+          type  = "quantitative",
+          title = "Total Fertility Rate",
+          axis  = list(titleFontSize = 12)
+        ),
+        color = list(value = "#e15759"),
+        tooltip = list(
+          list(field = "survey_year",          title = "Survey Year"),
+          list(field = "total_fertility_rate", title = "Total Fertility Rate", format = ".1f")
+        )
       )
     ),
-    y = list(
-      field = "value",
-      type  = "quantitative",
-      title = "Value",
-      axis  = list(titleFontSize = 12)
-    ),
-    color = list(
-      field = "indicator",
-      type  = "nominal",
-      title = "Indicator",
-      scale = list(
-        domain = list("Total Fertility Rate", "Contraception Use (%)", "Unmet Need for Family Planning (%)"),
-        range  = list("#e15759", "#4e79a7", "#f28e2b")
+
+    list(
+      width  = 500,
+      height = 180,
+      data   = list(values = jsonlite::fromJSON(jsonlite::toJSON(tanzania_other))),
+      mark   = list(type = "line", point = list(filled = TRUE, size = 80)),
+      encoding = list(
+        x = list(
+          field = "year_midpoint",
+          type  = "quantitative",
+          title = "Survey Year",
+          axis  = x_axis
+        ),
+        y = list(
+          field = "value",
+          type  = "quantitative",
+          title = "Percentage (%)",
+          axis  = list(titleFontSize = 12)
+        ),
+        color = list(
+          field = "indicator",
+          type  = "nominal",
+          title = "Indicator",
+          scale = list(
+            domain = list("Contraception Use (%)", "Unmet Need for Family Planning (%)"),
+            range  = list("#4e79a7", "#f28e2b")
+          )
+        ),
+        tooltip = list(
+          list(field = "survey_year", title = "Survey Year"),
+          list(field = "indicator",   title = "Indicator"),
+          list(field = "value",       title = "Value", format = ".1f")
+        )
       )
-    ),
-    tooltip = list(
-      list(field = "survey_year",  type = "nominal",      title = "Survey Year"),
-      list(field = "indicator",    type = "nominal",      title = "Indicator"),
-      list(field = "value",        type = "quantitative", title = "Value", format = ".1f")
     )
+  ),
+  config = list(
+    font       = "system-ui, sans-serif",
+    background = "transparent",
+    view       = list(stroke = NULL),
+    axis = list(
+      labelFontSize = 11,
+      titleFontSize = 12,
+      titleColor    = "#73726c",
+      labelColor    = "#73726c"
+    ),
+    title = list(color = "#2c2c2a", subtitleColor = "#888")
   )
 ))
 
 spec
 ```
 
+Tanzania's reproductive health data from 1991 to 2016 tells the story of a nation beginning its transition toward greater development. In economics, we often explore how the poverty trap can be overcome through a reduction in the total fertility rate and increased contraception use. Tanzania appears to be right on track, as over the past 25 years contraception use has increased by more than 30% and the total fertility rate has dropped by a full child per woman. This could be the beginning of a period of significant economic development for Tanzania.
 
 Exercise 4:
 ```{r}
@@ -377,276 +423,185 @@ Exercise 4:
 library(tidyverse)
 library(vegawidget)
 
-spec <- as_vegaspec(list({
-  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
-  "title": {
-    "text": "The Price of Talent: Soccer Player Market Values",
-    "subtitle": [
-      "Source: Transfermarkt (transfermarkt.com), 2024–25 season estimates.",
-      "Top 5 European leagues · market values in €M · hover any mark for details"
-    ],
-    "fontSize": 16,
-    "subtitleFontSize": 12,
-    "subtitleColor": "#73726c",
-    "anchor": "start",
-    "offset": 12
-  },
-  "data": {
-    "url": "players.csv",
-    "format": {"type": "csv"}
-  },
-  "transform": [
-    {"calculate": "toNumber(datum.market_value_m)",  "as": "value"},
-    {"calculate": "toNumber(datum.peak_value_m)",    "as": "peak"},
-    {"calculate": "toNumber(datum.age)",             "as": "age_n"},
-    {"calculate": "datum.value / datum.peak",        "as": "retention"}
-  ],
-  "vconcat": [
-    {
-      "title": {
-        "text": "Market value vs. age — the career peak curve",
-        "fontSize": 13,
-        "anchor": "start",
-        "offset": 8
-      },
-      "width": 580,
-      "height": 280,
-      "layer": [
-        {
-          "mark": {
-            "type": "point",
-            "filled": true,
-            "opacity": 0.75,
-            "stroke": "white",
-            "strokeWidth": 0.6
-          },
-          "encoding": {
-            "x": {
-              "field": "age_n",
-              "type": "quantitative",
-              "title": "Age",
-              "scale": {"domain": [15, 39]},
-              "axis": {"tickCount": 12, "grid": true, "gridColor": "#e8e6e0", "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
-            },
-            "y": {
-              "field": "value",
-              "type": "quantitative",
-              "title": "Market Value (€M)",
-              "scale": {"domain": [0, 200]},
-              "axis": {"tickCount": 5, "grid": true, "gridColor": "#e8e6e0", "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
-            },
-            "size": {
-              "field": "value",
-              "type": "quantitative",
-              "scale": {"range": [40, 600]},
-              "legend": null
-            },
-            "color": {
-              "field": "position_group",
-              "type": "nominal",
-              "title": "Position",
-              "scale": {
-                "domain": ["Attack", "Midfield", "Defender", "Goalkeeper"],
-                "range": ["#E24B4A", "#378ADD", "#1D9E75", "#BA7517"]
-              },
-              "legend": {
-                "orient": "top-left",
-                "direction": "horizontal",
-                "titleFontSize": 11,
-                "labelFontSize": 11,
-                "symbolSize": 90,
-                "offset": 4
-              }
-            },
-            "tooltip": [
-              {"field": "name",           "title": "Player"},
-              {"field": "club",           "title": "Club"},
-              {"field": "league",         "title": "League"},
-              {"field": "position",       "title": "Position"},
-              {"field": "age",            "title": "Age"},
-              {"field": "market_value_m", "title": "Value (€M)"},
-              {"field": "peak_value_m",   "title": "Peak Value (€M)"},
-              {"field": "country_of_citizenship", "title": "Nationality"}
-            ]
-          }
-        },
-        {
-          "mark": {
-            "type": "line",
-            "color": "#3d3d3a",
-            "strokeWidth": 2,
-            "opacity": 0.5,
-            "strokeDash": [5, 3]
-          },
-          "transform": [
-            {"loess": "value", "on": "age_n", "bandwidth": 0.5}
-          ],
-          "encoding": {
-            "x": {"field": "age_n", "type": "quantitative"},
-            "y": {"field": "value", "type": "quantitative"}
-          }
-        },
-        {
-          "mark": {
-            "type": "text",
-            "dy": -10,
-            "fontSize": 10,
-            "fontWeight": 500,
-            "color": "#3d3d3a"
-          },
-          "transform": [{"filter": "datum.value >= 150"}],
-          "encoding": {
-            "x":    {"field": "age_n", "type": "quantitative"},
-            "y":    {"field": "value", "type": "quantitative"},
-            "text": {"field": "name",  "type": "nominal"}
-          }
-        }
-      ]
-    },
-    {
-      "title": {
-        "text": "Average market value by position and league",
-        "fontSize": 13,
-        "anchor": "start",
-        "offset": 8
-      },
-      "width": 580,
-      "height": 210,
-      "transform": [
-        {
-          "aggregate": [
-            {"op": "mean",  "field": "value", "as": "avg_value"},
-            {"op": "count", "field": "name",  "as": "n_players"}
-          ],
-          "groupby": ["league", "position_group"]
-        }
-      ],
-      "mark": {"type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3},
-      "encoding": {
-        "x": {
-          "field": "league",
-          "type": "nominal",
-          "title": null,
-          "sort": ["Premier League", "La Liga", "Bundesliga", "Serie A", "Ligue 1"],
-          "axis": {"labelFontSize": 11, "labelColor": "#3d3d3a", "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
-        },
-        "xOffset": {
-          "field": "position_group",
-          "type": "nominal",
-          "sort": ["Attack", "Midfield", "Defender", "Goalkeeper"]
-        },
-        "y": {
-          "field": "avg_value",
-          "type": "quantitative",
-          "title": "Avg market value (€M)",
-          "axis": {"grid": true, "gridColor": "#e8e6e0", "tickCount": 5, "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
-        },
-        "color": {
-          "field": "position_group",
-          "type": "nominal",
-          "scale": {
-            "domain": ["Attack", "Midfield", "Defender", "Goalkeeper"],
-            "range": ["#E24B4A", "#378ADD", "#1D9E75", "#BA7517"]
-          },
-          "legend": null
-        },
-        "tooltip": [
-          {"field": "league",         "title": "League"},
-          {"field": "position_group", "title": "Position group"},
-          {"field": "avg_value",      "title": "Avg value (€M)", "format": ".1f"},
-          {"field": "n_players",      "title": "# Players"}
-        ]
-      }
-    },
-    {
-      "title": {
-        "text": "Current value vs. peak career value — who has depreciated?",
-        "fontSize": 13,
-        "anchor": "start",
-        "offset": 8
-      },
-      "width": 580,
-      "height": 260,
-      "layer": [
-        {
-          "data": {"values": [{"x": 0, "y": 0}, {"x": 200, "y": 200}]},
-          "mark": {"type": "line", "strokeDash": [5, 3], "color": "#b4b2a9", "strokeWidth": 1},
-          "encoding": {
-            "x": {"field": "x", "type": "quantitative"},
-            "y": {"field": "y", "type": "quantitative"}
-          }
-        },
-        {
-          "mark": {
-            "type": "point",
-            "filled": true,
-            "opacity": 0.75,
-            "stroke": "white",
-            "strokeWidth": 0.5
-          },
-          "encoding": {
-            "x": {
-              "field": "peak",
-              "type": "quantitative",
-              "title": "Peak career value (€M)",
-              "scale": {"domain": [0, 200]},
-              "axis": {"grid": true, "gridColor": "#e8e6e0", "tickCount": 5, "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
-            },
-            "y": {
-              "field": "value",
-              "type": "quantitative",
-              "title": "Current value (€M)",
-              "scale": {"domain": [0, 200]},
-              "axis": {"grid": true, "gridColor": "#e8e6e0", "tickCount": 5, "domainColor": "#d3d1c7", "tickColor": "#d3d1c7"}
-            },
-            "size": {
-              "field": "age_n",
-              "type": "quantitative",
-              "scale": {"range": [30, 300]},
-              "legend": {"title": "Age", "orient": "bottom-right", "titleFontSize": 10, "labelFontSize": 10}
-            },
-            "color": {
-              "field": "retention",
-              "type": "quantitative",
-              "title": "Value retained",
-              "scale": {"domain": [0.1, 1.0], "scheme": "redyellowgreen"},
-              "legend": {
-                "orient": "right",
-                "titleFontSize": 11,
-                "labelFontSize": 10,
-                "gradientLength": 110,
-                "format": ".0%"
-              }
-            },
-            "tooltip": [
-              {"field": "name",           "title": "Player"},
-              {"field": "club",           "title": "Club"},
-              {"field": "age",            "title": "Age"},
-              {"field": "peak_value_m",   "title": "Peak value (€M)"},
-              {"field": "market_value_m", "title": "Current value (€M)"},
-              {"field": "retention",      "title": "Value retained", "format": ".0%"}
-            ]
-          }
-        }
-      ]
-    }
-  ],
-  "config": {
-    "font": "system-ui, sans-serif",
-    "background": "transparent",
-    "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 11,
-      "titleFontSize": 11,
-      "titleColor": "#73726c",
-      "labelColor": "#73726c"
-    },
-    "title": {"color": "#3d3d3a", "subtitleColor": "#73726c"}
-  }
-})
+pl <- read_csv("pl_2324_xg.csv", show_col_types = FALSE) |>
+  mutate(
+    over_performance = goals_for - xg_for,
+    xg_diff          = xg_for - xg_against,
+    zone             = if_else(zone == "Relegated Zone", "No Europe", zone)
+  )
+
+spec <- as_vegaspec(list(
+  `$schema` = "https://vega.github.io/schema/vega-lite/v5.json",
+  title = "xG(Expected Goals) vs. Actual Goals, 2023–24 Premier League",
+  width  = 500,
+  height = 420,
+  data   = list(values = jsonlite::fromJSON(jsonlite::toJSON(pl))),
+  layer  = list(
+
+    list(
+      data = list(values = list(list(x = 30, y = 30), list(x = 100, y = 100))),
+      mark = list(type = "line", strokeDash = list(6, 4), color = "grey",
+                  strokeWidth = 1.2, opacity = 0.8),
+      encoding = list(
+        x = list(field = "x", type = "quantitative"),
+        y = list(field = "y", type = "quantitative")
+      )
+    ),
+
+    list(
+      data = list(values = list(list(lx = 60, ly = 80, txt = "Overperformed xG \u2197"))),
+      mark = list(type = "text", fontSize = 10, fontStyle = "italic", color = "green", opacity = 0.9),
+      encoding = list(
+        x    = list(field = "lx",  type = "quantitative"),
+        y    = list(field = "ly",  type = "quantitative"),
+        text = list(field = "txt", type = "nominal")
+      )
+    ),
+
+    list(
+      data = list(values = list(list(lx = 82, ly = 62, txt = "\u2196 Underperformed xG"))),
+      mark = list(type = "text", fontSize = 10, fontStyle = "italic", color = "red", opacity = 0.9),
+      encoding = list(
+        x    = list(field = "lx",  type = "quantitative"),
+        y    = list(field = "ly",  type = "quantitative"),
+        text = list(field = "txt", type = "nominal")
+      )
+    ),
+
+    list(
+      mark = list(type = "point", filled = TRUE, opacity = 0.88,
+                  stroke = "white", strokeWidth = 1.0),
+      encoding = list(
+        x = list(
+          field = "xg_for",
+          type  = "quantitative",
+          title = "Expected Goals (xG For)",
+          scale = list(domain = list(30, 100), zero = FALSE),
+          axis  = list(grid = TRUE, gridColor = "#e8e6e0", tickCount = 8,
+                       domainColor = "#d3d1c7", tickColor = "#d3d1c7", titleFontSize = 12)
+        ),
+        y = list(
+          field = "goals_for",
+          type  = "quantitative",
+          title = "Actual Goals Scored",
+          scale = list(domain = list(30, 100), zero = FALSE),
+          axis  = list(grid = TRUE, gridColor = "#e8e6e0", tickCount = 8,
+                       domainColor = "#d3d1c7", tickColor = "#d3d1c7", titleFontSize = 12)
+        ),
+        size = list(
+          field  = "points",
+          type   = "quantitative",
+          title  = "Points",
+          scale  = list(range = list(60, 700)),
+          legend = list(orient = "bottom-right", titleFontSize = 10,
+                        labelFontSize = 10, values = list(20, 40, 60, 80, 91))
+        ),
+        color = list(
+          field  = "zone",
+          type   = "nominal",
+          title  = "Finish",
+          scale  = list(
+            domain = list("Title", "Champions League", "Europa League",
+                          "No Europe", "Relegated"),
+            range  = list("#1a6faf", "#4e79a7", "#76b7b2", "#888780", "#e15759")
+          ),
+          legend = list(orient = "right", titleFontSize = 11,
+                        labelFontSize = 10, symbolSize = 120)
+        ),
+        tooltip = list(
+          list(field = "team",             title = "Team"),
+          list(field = "final_position",   title = "Final Position"),
+          list(field = "points",           title = "Points"),
+          list(field = "goals_for",        title = "Goals Scored"),
+          list(field = "xg_for",           title = "xG For",       format = ".1f"),
+          list(field = "over_performance", title = "Goals vs xG",  format = "+.1f"),
+          list(field = "goals_against",    title = "Goals Conceded"),
+          list(field = "xg_against",       title = "xG Against",   format = ".1f")
+        )
+      )
+    )
+  ),
+  config = list(
+    font       = "system-ui, sans-serif",
+    background = "transparent",
+    view       = list(stroke = NULL),
+    axis = list(labelFontSize = 11, titleFontSize = 12,
+                titleColor = "#73726c", labelColor = "#73726c"),
+    title = list(color = "#2c2c2a", subtitleColor = "#888")
+  )
+))
+
 spec
 ```
 
+Data Source:
+
+The data was sourced from FBref, which uses StatsBomb's expected goals model. FBref is maintained by Sports Reference LLC and is one of the most widely cited sources for soccer statistics.
+
+FBref / StatsBomb. (2024). 2023-24 Premier League squad shooting and standard stats. Sports Reference LLC. https://fbref.com/en/comps/9/2023-2024/2023-2024-Premier-League-Stats
+
+Design Choices:
+
+I designed this graphic to plot each Premier League team's expected goals (xG) against their actual goals scored, using bubble size to encode points earned and color to encode league finish zone. I made several deliberate design decisions to make the chart as readable and informative as possible.
+
+The most important element I included is the diagonal reference line, which acts as a benchmark for perfect performance. Teams above the line scored more than their chances deserved, while teams below left goals on the pitch. I chose to include this because I wanted to show comparisons directly in the data rather than forcing the reader to compute them mentally. I also added two italic text annotations labeling the overperformed and underperformed regions to reinforce this without requiring a separate legend or caption.
+
+I chose color to encode meaning rather than just category. I used blue shades for top finishers and red for relegated teams, which I felt maps intuitively to good and bad outcomes. I used a neutral gray for mid-table teams who finished with no European football, which I felt kept the visual hierarchy clear without drawing attention away from the more interesting finishes at the top and bottom.
+
+I set both the x and y axes to start at 30 rather than 0 using zero = FALSE, because no team scored fewer than 35 goals. I felt that starting at zero would compress all the data into a small corner of the chart and waste the majority of the plotting area, making the differences between teams much harder to see.
+
 Exercise 5:
 
+1. An encoding channel other than x or y
+
+In Exercise 4, color encodes league finish zone and size encodes points earned. In Exercise 2, size is used to make the "Our Business" line thicker than competitors.
+
+2. Layers
+
+In Exercise 4, three layers are stacked using layer = list(...) — the dashed diagonal reference line, the two annotation text labels, and the bubble scatter plot.
+
+3. Facets
+
+In Exercise 1's second graphic, hconcat and vconcat inside make_panel() create a 2×3 grid of small multiples, one panel per twin pair.
+
+4. Concatenation or repeat
+
+In Exercise 3, vconcat stacks two panels vertically with a shared x-axis but different y-axes. In Exercise 1, hconcat arranges twin pair panels side by side.
+
+5. Non-default settings for a channel's scale or guide
+
+In Exercise 4, scale = list(domain = list(30, 100), zero = FALSE) prevents the axes from defaulting to zero. In Exercise 2, a custom domain and range manually assign red to "Our Business" and light blue to all competitors.
+
+6. Tooltips
+
+Used in every exercise. Most detailed example is Exercise 4, showing eight fields with custom titles and number formatting on hover.
+
+7. Another kind of interaction
+
+In Exercise 1's first graphic, clicking a region in the legend highlights that ancestry region and fades all others to 15% opacity using "bind": "legend" inside params.
+
 Exercise 6:
+
+a.
+
+1. 
+
+In Exercise 1, I implemented a legend-binding interaction using Vega-Lite's params with "bind": "legend" and a point selection, which highlights a selected ancestry region across all bars while fading unselected regions to 15% opacity. I learned this type of interaction through the Vega-Lite documentation under Interactive Charts — Bind to Scales and Legends.
+
+2.
+
+In Exercise 4, I added text annotation layers directly onto the scatter plot to label the 'Overperformed xG' and 'Underperformed xG' regions of the chart. This was done by adding separate text mark layers with fixed coordinate values, as documented in the Vega-Lite documentation under Text Mark, which is where I learned how to do it. 
+
+b.
+
+1. Maximizing Data-Ink Ratio — Tufte (2001),
+
+Tufte argues that non-data ink should be removed wherever possible to let the data speak for itself. In Exercise 4, I removed gridlines from the default style, used a transparent background, and kept the axis lines thin so that every element of ink on the chart encodes information rather than decoration. In Exercise 1's stacked bar chart, I omitted zero values entirely to reduce clutter, which I felt followed Tufte's principle of not drawing anything that adds nothing to the reader's understanding.
+
+2. Using Color to Encode Meaning — Wilke (2019), Chapter 4: Color Scales
+
+Wilke distinguishes between qualitative, sequential, and diverging color scales and warns against using color arbitrarily. In Exercise 4, I used color to encode a meaningful qualitative category, specifically league finish zone, with blue reserved for top finishers and red for relegated teams, which I felt maps intuitively to good and bad outcomes. In Exercise 2, I used red exclusively for our business and a neutral light blue for all competitors, so that the color carries a clear signal to the reader rather than just distinguishing categories for the sake of it.
+
+3. Avoiding Chartjunk — Tufte (2001),
+
+Tufte defines chartjunk as visual elements that clutter a graphic without adding information, including unnecessary tick marks, heavy grid lines, and decorative fills. In Exercise 3, I hid the x-axis on the top panel entirely since the bottom panel already carries the shared axis labels, which I felt avoided redundant ink and kept the two panels feeling connected. Across all of my exercises, I suppressed legends where the color mapping was self-evident from context and kept axis titles short, only including them where I felt they were necessary for the reader to understand the chart.
